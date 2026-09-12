@@ -1,5 +1,3 @@
-const API = '/api';
-
 const STATUS_LABEL = {
   trong: 'Còn trống',
   da_thue: 'Đã thuê',
@@ -9,20 +7,21 @@ const ROOM_TYPE_LABEL = {
   ban_cong: 'Ban công',
   ben_trong: 'Bên trong'
 };
+const VALID_STATUS = Object.keys(STATUS_LABEL);
+const VALID_ROOM_TYPE = Object.keys(ROOM_TYPE_LABEL);
 
 let PROPERTIES = [];
 let ROOMS = [];
 let filters = { propertyId: '', status: '', q: '' };
 
-// ── Data layer — điểm nối duy nhất với backend.
-// Sau này đổi sang API thật/DB khác thì chỉ sửa 2 hàm này, không đụng UI. ──
 async function loadData() {
-  const [propsRes, roomsRes] = await Promise.all([
-    fetch(`${API}/properties`),
-    fetch(`${API}/rooms`)
-  ]);
-  PROPERTIES = await propsRes.json();
-  ROOMS = await roomsRes.json();
+  const data = await storeLoad();
+  PROPERTIES = data.properties;
+  ROOMS = data.rooms;
+}
+
+function persist() {
+  storePersist(PROPERTIES, ROOMS);
 }
 
 function fmtPrice(n) {
@@ -41,6 +40,7 @@ function render() {
 
   if (!visibleProperties.length) {
     el.innerHTML = '<div class="empty-state">Chưa có khu/property nào. Bấm "+ Thêm khu" để bắt đầu.</div>';
+    document.getElementById('roomCount').textContent = 0;
     return;
   }
 
@@ -75,12 +75,15 @@ function render() {
         </div>
         <div class="room-grid">
           ${rooms.map(r => `
-            <div class="room-card" onclick="openRoomModal('${r.id}')">
+            <div class="room-card">
               <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
-              <div class="floor">${r.floor}</div>
-              <div class="code">${r.code}</div>
-              <div class="meta">${ROOM_TYPE_LABEL[r.roomType] || r.roomType} · ${r.areaM2}m²</div>
-              <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+              <div onclick="openRoomModal('${r.id}')">
+                <div class="floor">${r.floor}</div>
+                <div class="code">${r.code}</div>
+                <div class="meta">${ROOM_TYPE_LABEL[r.roomType] || r.roomType} · ${r.areaM2}m²</div>
+                <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+              </div>
+              <button class="btn btn-sm" style="margin-top:8px;" onclick="exportRoom('${r.id}')">Xuất PDF phòng này</button>
             </div>
           `).join('')}
         </div>
@@ -180,7 +183,7 @@ function validateRoomForm() {
   return ok;
 }
 
-async function saveRoom(roomId) {
+function saveRoom(roomId) {
   if (!validateRoomForm()) return;
   const payload = {
     propertyId: document.getElementById('f_propertyId').value,
@@ -193,29 +196,26 @@ async function saveRoom(roomId) {
     images: document.getElementById('f_images').value.split('\n').map(s => s.trim()).filter(Boolean),
     notes: document.getElementById('f_notes').value.trim()
   };
-  const url = roomId ? `${API}/rooms/${roomId}` : `${API}/rooms`;
-  const method = roomId ? 'PUT' : 'POST';
-  const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-  if (!res.ok) {
-    const err = await res.json();
-    alert('Lỗi: ' + err.error);
+  if (!VALID_ROOM_TYPE.includes(payload.roomType) || !VALID_STATUS.includes(payload.status)) {
+    alert('Loại phòng hoặc trạng thái không hợp lệ');
     return;
   }
+  if (roomId) {
+    const idx = ROOMS.findIndex(r => r.id === roomId);
+    ROOMS[idx] = { ...ROOMS[idx], ...payload, id: roomId };
+  } else {
+    ROOMS.push({ id: genId('R', ROOMS), ...payload });
+  }
+  persist();
   closeModal('roomModalOverlay');
-  await loadData();
   render();
 }
 
-async function deleteRoom(roomId) {
+function deleteRoom(roomId) {
   if (!confirm('Xoá phòng này? Không thể hoàn tác.')) return;
-  const res = await fetch(`${API}/rooms/${roomId}`, { method: 'DELETE' });
-  if (!res.ok) {
-    const err = await res.json();
-    alert('Lỗi: ' + err.error);
-    return;
-  }
+  ROOMS = ROOMS.filter(r => r.id !== roomId);
+  persist();
   closeModal('roomModalOverlay');
-  await loadData();
   render();
 }
 
@@ -293,7 +293,7 @@ function validatePropertyForm() {
   return ok;
 }
 
-async function saveProperty(propertyId) {
+function saveProperty(propertyId) {
   if (!validatePropertyForm()) return;
   const split = id => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
   const payload = {
@@ -308,30 +308,28 @@ async function saveProperty(propertyId) {
     commissionPolicy: split('pf_commission'),
     notes: document.getElementById('pf_notes').value.trim()
   };
-  const url = propertyId ? `${API}/properties/${propertyId}` : `${API}/properties`;
-  const method = propertyId ? 'PUT' : 'POST';
-  const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-  if (!res.ok) {
-    const err = await res.json();
-    alert('Lỗi: ' + err.error);
-    return;
+  if (propertyId) {
+    const idx = PROPERTIES.findIndex(p => p.id === propertyId);
+    PROPERTIES[idx] = { ...PROPERTIES[idx], ...payload, id: propertyId };
+  } else {
+    PROPERTIES.push({ id: genId('P', PROPERTIES), ...payload, promotion: null, utilityFees: {} });
   }
+  persist();
   closeModal('propertyModalOverlay');
-  await loadData();
   render();
 }
 
-async function deleteProperty(propertyId) {
-  if (!confirm('Xoá khu này? Chỉ xoá được nếu không còn phòng nào bên trong.')) return;
-  const res = await fetch(`${API}/properties/${propertyId}`, { method: 'DELETE' });
-  if (!res.ok) {
-    const err = await res.json();
-    alert('Lỗi: ' + err.error);
+function deleteProperty(propertyId) {
+  const hasRooms = ROOMS.some(r => r.propertyId === propertyId);
+  if (hasRooms) {
+    alert('Property này còn phòng bên trong — xoá hết phòng trước khi xoá property');
     return;
   }
+  if (!confirm('Xoá khu này? Không thể hoàn tác.')) return;
+  PROPERTIES = PROPERTIES.filter(p => p.id !== propertyId);
+  persist();
   closeModal('propertyModalOverlay');
   filters.propertyId = '';
-  await loadData();
   render();
 }
 
@@ -345,6 +343,14 @@ function exportProperty(propertyId) {
 }
 function exportRoom(roomId) {
   window.open(`export.html?type=room&id=${roomId}`, '_blank');
+}
+
+async function resetSampleData() {
+  if (!confirm('Xoá hết data hiện tại, nạp lại data mẫu ban đầu?')) return;
+  const data = await storeResetToSample();
+  PROPERTIES = data.properties;
+  ROOMS = data.rooms;
+  render();
 }
 
 // ── Init ──────────────────────────────────────────────────

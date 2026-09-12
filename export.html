@@ -29,8 +29,8 @@
 <div class="toolbar-print"><button onclick="window.print()">In / Xuất PDF</button></div>
 <div id="content">Đang tải...</div>
 
+<script src="js/store.js"></script>
 <script>
-const API = '/api';
 const params = new URLSearchParams(location.search);
 const type = params.get('type');
 const id = params.get('id');
@@ -75,9 +75,7 @@ function renderPolicyBlocks(prop) {
 }
 
 async function render() {
-  const [propsRes, roomsRes] = await Promise.all([fetch(`${API}/properties`), fetch(`${API}/rooms`)]);
-  const properties = await propsRes.json();
-  const rooms = await roomsRes.json();
+  const { properties, rooms } = await storeLoad();
 
   if (type === 'property') {
     const prop = properties.find(p => p.id === id);

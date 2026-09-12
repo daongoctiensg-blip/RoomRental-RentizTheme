@@ -1,23 +1,29 @@
 # Room Rental — Quản lý phòng trọ / căn hộ
 
-Công cụ nội bộ quản lý danh sách phòng trọ/căn hộ cho thuê nhiều khu (property). Không public — chỉ team dùng để tra cứu và xuất tin đăng (PDF) gửi khách.
+Công cụ nội bộ quản lý danh sách phòng trọ/căn hộ cho thuê nhiều khu (property). Bản này là **static site 100%** (không backend) — deploy free trên GitHub Pages.
 
 ## Chạy local
 
-```bash
-npm install
-npm start
-```
+M�� trực tiếp `index.html` bằng trình duyệt, hoặc chạy 1 static server bất kỳ (ví dụ `npx serve .`).
 
-Mở `http://localhost:4001`
+## Đăng nhập
+
+M� truy cập: hỏi Boss. Chỉ chặn người vô tình lướt vào — không phải bảo mật thật (client-side).
+
+## Lưu trữ data
+
+**Không có backend, không có database thật.** Data lưu trong `localStorage` của trình duyệt:
+- Lần đầu mở, tự nạp data mẫu từ `data/properties.json` + `data/rooms.json`
+- Mọi thay đổi (thêm/sửa/xoá qua form) lưu vào `localStorage`, **chỉ tồn tại trên máy/trình duyệt đó** — đổi máy, xoá cache, hay dùng trình duyệt khác sẽ mất, không đồng bộ giữa nhiều người dùng
+- Nút "Nạp lại data mẫu" ở header: xoá hết, nạp lại đúng data gốc trong `data/*.json`
 
 ## Kiến trúc
 
-- `server.js` — Express, phục vụ file tĩnh trong `public/` + API CRUD đọc/ghi `data/*.json`
-- `data/properties.json` — danh sách khu/tòa nhà
-- `data/rooms.json` — danh sách phòng, mỗi phòng có `propertyId` trỏ về property cha
-- `public/index.html` + `js/app.js` — danh sách, filter, form thêm/sửa/xoá
-- `public/export.html` — trang xuất PDF (theo property hoặc theo room), dùng `window.print()`, không cần thư viện PDF
+- `index.html` + `js/app.js` — danh sách, filter, form thêm/sửa/xoá
+- `js/store.js` — lớp lưu trữ (localStorage), thay cho backend
+- `js/keygate.js` — popup hỏi mã truy cập, hash SHA-256
+- `export.html` — trang xuất PDF (theo property hoặc room), dùng `window.print()`
+- `data/*.json` — data mẫu ban đầu (chỉ dùng lúc seed lần đầu, sau đó mọi sửa đổi nằm ở localStorage, không ghi lại vào file này)
 
 ## Data model
 
@@ -25,13 +31,12 @@ Mở `http://localhost:4001`
 
 **Room**: id, propertyId (FK → Property.id), floor, code, roomType (`ban_cong` | `ben_trong`), areaM2, priceMonthly, status (`trong` | `da_thue` | `dang_giu_cho`), images[], notes
 
-## Quy tắc nghiệp vụ
+## Deploy GitHub Pages
 
-- Không xoá được property nếu còn phòng bên trong — phải xoá/chuyển phòng trước
-- Xuất PDF theo property: chỉ liệt kê phòng chưa `da_thue` (ẩn phòng đã cho thuê khỏi bản gửi khách)
+Repo Settings → Pages → Source: branch `main`, folder `/ (root)`.
 
 ## Việc còn lại (chưa làm ở bản này)
 
+- Data không đồng bộ giữa nhiều người/nhiều máy — mỗi người sửa trên máy mình, không thấy thay đổi của người khác
 - Chưa có xử lý ảnh upload thật (đang nhận link URL qua textarea)
-- Chưa có đăng nhập/phân quyền — ai chạy được server đều sửa được data
-- Khi deploy lên VPS: đổi `data/*.json` sang SQLite/DB thật nếu cần, giữ nguyên API contract nên frontend không cần sửa
+- Nếu sau này cần data thật dùng chung nhiều người: phải quay lại có backend + database (đã có bản Express CRUD ở lần build trước, có thể khôi phục khi cần)
