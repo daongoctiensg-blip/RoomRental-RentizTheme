@@ -62,6 +62,13 @@ function fmtPrice(n) {
   return Number(n).toLocaleString('vi-VN') + 'đ';
 }
 
+function fullAddress(prop) {
+  const parts = [prop.soNha, prop.ward];
+  if (prop.quan) parts.push(prop.quan);
+  parts.push(prop.city);
+  return parts.filter(Boolean).join(', ');
+}
+
 function matchesBaseFilters(prop, room, opts) {
   opts = opts || {};
   if (filters.propertyId && prop.id !== filters.propertyId) return false;
@@ -70,7 +77,7 @@ function matchesBaseFilters(prop, room, opts) {
   if (!opts.skipStatus && filters.status && room.status !== filters.status) return false;
   if (!opts.skipPrice && (room.priceMonthly < filters.priceFrom || room.priceMonthly > filters.priceTo)) return false;
   const q = filters.q.trim().toLowerCase();
-  if (q && !(room.code.toLowerCase().includes(q) || prop.name.toLowerCase().includes(q) || prop.address.toLowerCase().includes(q))) return false;
+  if (q && !(room.code.toLowerCase().includes(q) || prop.soNha.toLowerCase().includes(q))) return false;
   return true;
 }
 
@@ -132,7 +139,7 @@ function render() {
   const el = document.getElementById('main-content');
   const propSelect = document.getElementById('filterProperty');
   propSelect.innerHTML = '<option value="">Tất cả khu</option>' +
-    PROPERTIES.map(p => `<option value="${p.id}" ${filters.propertyId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+    PROPERTIES.map(p => `<option value="${p.id}" ${filters.propertyId === p.id ? 'selected' : ''}>${p.soNha}</option>`).join('');
 
   const visibleProperties = PROPERTIES.filter(p => {
     if (filters.propertyId && p.id !== filters.propertyId) return false;
@@ -159,8 +166,8 @@ function render() {
       <div class="property-block">
         <div class="property-head">
           <div>
-            <h2>${prop.name}</h2>
-            <div class="addr">${prop.address}, ${prop.ward}, ${prop.city}</div>
+            <h2>${prop.soNha}</h2>
+            <div class="addr">${fullAddress(prop)}</div>
           </div>
           <div class="property-actions">
             <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa khu</button>
@@ -206,7 +213,7 @@ function openRoomModal(roomId, presetPropertyId) {
       <div class="form-row">
         <label>Thuộc khu</label>
         <select id="f_propertyId">
-          ${PROPERTIES.map(p => `<option value="${p.id}" ${((room && room.propertyId === p.id) || presetPropertyId === p.id) ? 'selected' : ''}>${p.name}</option>`).join('')}
+          ${PROPERTIES.map(p => `<option value="${p.id}" ${((room && room.propertyId === p.id) || presetPropertyId === p.id) ? 'selected' : ''}>${p.soNha}</option>`).join('')}
         </select>
       </div>
       <div class="form-grid-2">
@@ -321,12 +328,7 @@ function openPropertyModal(propertyId) {
   overlay.id = 'propertyModalOverlay';
   overlay.innerHTML = `
     <div class="modal-box">
-      <h2>${prop ? 'Sửa khu: ' + prop.name : 'Thêm khu mới'}</h2>
-      <div class="form-row">
-        <label>Tên khu/tòa *</label>
-        <input id="pf_name" value="${prop ? prop.name : ''}">
-        <div class="field-error" id="err_name">Bắt buộc nhập tên</div>
-      </div>
+      <h2>${prop ? 'Sửa khu: ' + prop.soNha : 'Thêm khu mới'}</h2>
       <div class="form-row">
         <label>Loại hình</label>
         <select id="pf_propertyType">
@@ -335,9 +337,9 @@ function openPropertyModal(propertyId) {
         </select>
       </div>
       <div class="form-row">
-        <label>Địa chỉ *</label>
-        <input id="pf_address" value="${prop ? prop.address : ''}">
-        <div class="field-error" id="err_address">Bắt buộc nhập địa chỉ</div>
+        <label>Số nhà / Địa chỉ chi tiết *</label>
+        <input id="pf_soNha" value="${prop ? prop.soNha : ''}" placeholder="CHDV Lô C6, Khu dân cư Nam Long, Khu phố 2">
+        <div class="field-error" id="err_soNha">Bắt buộc nhập số nhà/địa chỉ</div>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
@@ -345,9 +347,13 @@ function openPropertyModal(propertyId) {
           <input id="pf_ward" list="wardList" value="${prop ? prop.ward : ''}">
         </div>
         <div class="form-row">
-          <label>Tỉnh/Thành phố</label>
-          <input id="pf_city" value="${prop ? prop.city : 'Thành phố Hồ Chí Minh'}">
+          <label>Quận (địa chỉ cũ, thường để trống)</label>
+          <input id="pf_quan" value="${prop ? prop.quan || '' : ''}" placeholder="Để trống nếu địa chỉ mới">
         </div>
+      </div>
+      <div class="form-row">
+        <label>Tỉnh/Thành phố</label>
+        <input id="pf_city" value="${prop ? prop.city : 'Thành phố Hồ Chí Minh'}">
       </div>
       <div class="form-row">
         <label>Số điện thoại liên hệ</label>
@@ -385,12 +391,9 @@ function openPropertyModal(propertyId) {
 
 function validatePropertyForm() {
   let ok = true;
-  const name = document.getElementById('pf_name').value.trim();
-  const address = document.getElementById('pf_address').value.trim();
-  document.getElementById('err_name').style.display = name ? 'none' : 'block';
-  document.getElementById('err_address').style.display = address ? 'none' : 'block';
-  if (!name) ok = false;
-  if (!address) ok = false;
+  const soNha = document.getElementById('pf_soNha').value.trim();
+  document.getElementById('err_soNha').style.display = soNha ? 'none' : 'block';
+  if (!soNha) ok = false;
   return ok;
 }
 
@@ -398,10 +401,10 @@ function saveProperty(propertyId) {
   if (!validatePropertyForm()) return;
   const split = id => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
   const payload = {
-    name: document.getElementById('pf_name').value.trim(),
     propertyType: document.getElementById('pf_propertyType').value,
-    address: document.getElementById('pf_address').value.trim(),
+    soNha: document.getElementById('pf_soNha').value.trim(),
     ward: document.getElementById('pf_ward').value.trim(),
+    quan: document.getElementById('pf_quan').value.trim(),
     city: document.getElementById('pf_city').value.trim(),
     phone: document.getElementById('pf_phone').value.trim(),
     amenities: split('pf_amenities'),

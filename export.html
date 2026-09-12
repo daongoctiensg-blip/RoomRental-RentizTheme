@@ -38,6 +38,13 @@ const id = params.get('id');
 function fmtPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
 const ROOM_TYPE_LABEL = { ban_cong: 'Ban công', ben_trong: 'Bên trong' };
 
+function fullAddress(prop) {
+  const parts = [prop.soNha, prop.ward];
+  if (prop.quan) parts.push(prop.quan);
+  parts.push(prop.city);
+  return parts.filter(Boolean).join(', ');
+}
+
 function isPromoActive(promo) {
   if (!promo || !promo.text) return false;
   const today = new Date().toISOString().slice(0, 10);
@@ -82,8 +89,8 @@ async function render() {
     if (!prop) { document.getElementById('content').innerHTML = 'Không tìm thấy khu này.'; return; }
     const propRooms = rooms.filter(r => r.propertyId === prop.id);
     document.getElementById('content').innerHTML = `
-      <h1>${prop.name}</h1>
-      <div class="addr">${prop.address}, ${prop.ward}, ${prop.city}</div>
+      <h1>${prop.soNha}</h1>
+      <div class="addr">${fullAddress(prop)}</div>
       ${isPromoActive(prop.promotion) ? `<div class="promo">${prop.promotion.text} — áp dụng đến ${prop.promotion.validTo}</div>` : ''}
       <h2>Thông tin chung</h2>
       ${propRooms.filter(r => r.status !== 'da_thue').map(r => `
@@ -103,8 +110,8 @@ async function render() {
     if (!room) { document.getElementById('content').innerHTML = 'Không tìm thấy phòng này.'; return; }
     const prop = properties.find(p => p.id === room.propertyId);
     document.getElementById('content').innerHTML = `
-      <h1>${prop.name} — ${room.floor} ${room.code}</h1>
-      <div class="addr">${prop.address}, ${prop.ward}, ${prop.city}</div>
+      <h1>${prop.soNha} — ${room.floor} ${room.code}</h1>
+      <div class="addr">${fullAddress(prop)}</div>
       <div class="room-line">
         <span>${ROOM_TYPE_LABEL[room.roomType] || room.roomType} · ${room.areaM2}m²</span>
         <span class="price">${fmtPrice(room.priceMonthly)}/tháng</span>
