@@ -1,0 +1,153 @@
+{
+  "Quận 1": [
+    {"label":"Bến Nghé (cũ)","match":"Phường Sài Gòn"},{"label":"Đa Kao (cũ)","match":"Phường Sài Gòn"},{"label":"Nguyễn Thái Bình (cũ)","match":"Phường Sài Gòn"},
+    {"label":"Tân Định (cũ)","match":"Phường Tân Định"},
+    {"label":"Bến Thành (cũ)","match":"Phường Bến Thành"},{"label":"Phạm Ngũ Lão (cũ)","match":"Phường Bến Thành"},
+    {"label":"Nguyễn Cư Trinh (cũ)","match":"Phường Cầu Ông Lãnh"},{"label":"Cầu Kho (cũ)","match":"Phường Cầu Ông Lãnh"},{"label":"Cô Giang (cũ)","match":"Phường Cầu Ông Lãnh"},
+    {"label":"Phường Sài Gòn (mới)","match":"Phường Sài Gòn"},{"label":"Phường Tân Định (mới)","match":"Phường Tân Định"},
+    {"label":"Phường Bến Thành (mới)","match":"Phường Bến Thành"},{"label":"Phường Cầu Ông Lãnh (mới)","match":"Phường Cầu Ông Lãnh"}
+  ],
+  "Quận 3": [
+    {"label":"Phường 1,2,3,5 - Q3 (cũ)","match":"Phường Bàn Cờ"},{"label":"Võ Thị Sáu (cũ)","match":"Phường Xuân Hòa"},
+    {"label":"Phường 9,11,12,14 - Q3 (cũ)","match":"Phường Nhiêu Lộc"},
+    {"label":"Phường Bàn Cờ (mới)","match":"Phường Bàn Cờ"},{"label":"Phường Xuân Hòa (mới)","match":"Phường Xuân Hòa"},{"label":"Phường Nhiêu Lộc (mới)","match":"Phường Nhiêu Lộc"}
+  ],
+  "Quận 4": [
+    {"label":"Phường 13,16,18 - Q4 (cũ)","match":"Phường Xóm Chiếu"},{"label":"Phường 8,9 - Q4 (cũ)","match":"Phường Khánh Hội"},{"label":"Phường 1,3 - Q4 (cũ)","match":"Phường Vĩnh Hội"},
+    {"label":"Phường Xóm Chiếu (mới)","match":"Phường Xóm Chiếu"},{"label":"Phường Khánh Hội (mới)","match":"Phường Khánh Hội"},{"label":"Phường Vĩnh Hội (mới)","match":"Phường Vĩnh Hội"}
+  ],
+  "Quận 5": [
+    {"label":"Phường 1,2,4 - Q5 (cũ)","match":"Phường Chợ Quán"},{"label":"Phường 5,7,9 - Q5 (cũ)","match":"Phường An Đông"},{"label":"Phường 11,12,13,14 - Q5 (cũ)","match":"Phường Chợ Lớn"},
+    {"label":"Phường Chợ Quán (mới)","match":"Phường Chợ Quán"},{"label":"Phường An Đông (mới)","match":"Phường An Đông"},{"label":"Phường Chợ Lớn (mới)","match":"Phường Chợ Lớn"}
+  ],
+  "Quận 6": [
+    {"label":"Phường 2,9 - Q6 (cũ)","match":"Phường Bình Tây"},{"label":"Phường 1,7,8 - Q6 (cũ)","match":"Phường Bình Tiên"},
+    {"label":"Phường 10,11 - Q6 (cũ)","match":"Phường Bình Phú"},{"label":"Phường 12,13,14 - Q6 (cũ)","match":"Phường Phú Lâm"},
+    {"label":"Phường Bình Tây (mới)","match":"Phường Bình Tây"},{"label":"Phường Bình Tiên (mới)","match":"Phường Bình Tiên"},{"label":"Phường Bình Phú (mới)","match":"Phường Bình Phú"},{"label":"Phường Phú Lâm (mới)","match":"Phường Phú Lâm"}
+  ],
+  "Quận 7": [
+    {"label":"Bình Thuận (cũ)","match":"Phường Tân Thuận"},{"label":"Tân Thuận Đông (cũ)","match":"Phường Tân Thuận"},{"label":"Tân Thuận Tây (cũ)","match":"Phường Tân Thuận"},
+    {"label":"Phú Thuận (cũ)","match":"Phường Phú Thuận"},{"label":"Phú Mỹ (cũ)","match":"Phường Phú Thuận"},
+    {"label":"Tân Phú (cũ, Q7)","match":"Phường Tân Mỹ"},
+    {"label":"Tân Phong (cũ)","match":"Phường Tân Hưng"},{"label":"Tân Quy (cũ)","match":"Phường Tân Hưng"},{"label":"Tân Kiểng (cũ)","match":"Phường Tân Hưng"},{"label":"Tân Hưng (cũ)","match":"Phường Tân Hưng"},
+    {"label":"Phường Tân Thuận (mới)","match":"Phường Tân Thuận"},{"label":"Phường Phú Thuận (mới)","match":"Phường Phú Thuận"},
+    {"label":"Phường Tân Mỹ (mới)","match":"Phường Tân Mỹ"},{"label":"Phường Tân Hưng (mới)","match":"Phường Tân Hưng"}
+  ],
+  "Quận 8": [
+    {"label":"Phường 4,5,6,7 - Q8 (cũ)","match":"Phường Chánh Hưng"},{"label":"Rạch Ông (cũ)","match":"Phường Chánh Hưng"},{"label":"Hưng Phú (cũ)","match":"Phường Chánh Hưng"},
+    {"label":"Phường 14,15,16 - Q8 (cũ)","match":"Phường Phú Định"},{"label":"Xóm Củi (cũ)","match":"Phường Phú Định"},
+    {"label":"Phường 6 - Q8 (cũ)","match":"Phường Bình Đông"},
+    {"label":"Phường Chánh Hưng (mới)","match":"Phường Chánh Hưng"},{"label":"Phường Phú Định (mới)","match":"Phường Phú Định"},{"label":"Phường Bình Đông (mới)","match":"Phường Bình Đông"}
+  ],
+  "Quận 10": [
+    {"label":"Phường 6,8 - Q10 (cũ)","match":"Phường Diên Hồng"},{"label":"Phường 1,2,4,9,10 - Q10 (cũ)","match":"Phường Vườn Lài"},{"label":"Phường 12,13,15 - Q10 (cũ)","match":"Phường Hòa Hưng"},
+    {"label":"Phường Diên Hồng (mới)","match":"Phường Diên Hồng"},{"label":"Phường Vườn Lài (mới)","match":"Phường Vườn Lài"},{"label":"Phường Hòa Hưng (mới)","match":"Phường Hòa Hưng"}
+  ],
+  "Quận 11": [
+    {"label":"Phường 1,7,16 - Q11 (cũ)","match":"Phường Minh Phụng"},{"label":"Phường 3,10 - Q11 (cũ)","match":"Phường Bình Thới"},
+    {"label":"Phường 5,14 - Q11 (cũ)","match":"Phường Hòa Bình"},{"label":"Phường 11,15 - Q11 (cũ)","match":"Phường Phú Thọ"},
+    {"label":"Phường Minh Phụng (mới)","match":"Phường Minh Phụng"},{"label":"Phường Bình Thới (mới)","match":"Phường Bình Thới"},{"label":"Phường Hòa Bình (mới)","match":"Phường Hòa Bình"},{"label":"Phường Phú Thọ (mới)","match":"Phường Phú Thọ"}
+  ],
+  "Quận 12": [
+    {"label":"Tân Thới Nhất (cũ)","match":"Phường Đông Hưng Thuận"},{"label":"Tân Hưng Thuận (cũ)","match":"Phường Đông Hưng Thuận"},
+    {"label":"Tân Chánh Hiệp (cũ)","match":"Phường Trung Mỹ Tây"},{"label":"Hiệp Thành (cũ)","match":"Phường Tân Thới Hiệp"},
+    {"label":"Thạnh Xuân (cũ)","match":"Phường Thới An"},{"label":"Thạnh Lộc (cũ)","match":"Phường An Phú Đông"},
+    {"label":"Phường Đông Hưng Thuận (mới)","match":"Phường Đông Hưng Thuận"},{"label":"Phường Trung Mỹ Tây (mới)","match":"Phường Trung Mỹ Tây"},
+    {"label":"Phường Tân Thới Hiệp (mới)","match":"Phường Tân Thới Hiệp"},{"label":"Phường Thới An (mới)","match":"Phường Thới An"},{"label":"Phường An Phú Đông (mới)","match":"Phường An Phú Đông"}
+  ],
+  "Bình Tân": [
+    {"label":"An Lạc A (cũ)","match":"Phường An Lạc"},{"label":"Bình Trị Đông B (cũ)","match":"Phường An Lạc"},
+    {"label":"Bình Hưng Hòa B (cũ)","match":"Phường Bình Tân"},{"label":"Tân Tạo A (cũ)","match":"Phường Tân Tạo"},
+    {"label":"Bình Trị Đông (cũ)","match":"Phường Bình Trị Đông"},{"label":"Bình Hưng Hòa A (cũ)","match":"Phường Bình Hưng Hòa"},
+    {"label":"Phường An Lạc (mới)","match":"Phường An Lạc"},{"label":"Phường Bình Tân (mới)","match":"Phường Bình Tân"},
+    {"label":"Phường Tân Tạo (mới)","match":"Phường Tân Tạo"},{"label":"Phường Bình Trị Đông (mới)","match":"Phường Bình Trị Đông"},{"label":"Phường Bình Hưng Hòa (mới)","match":"Phường Bình Hưng Hòa"}
+  ],
+  "Bình Thạnh": [
+    {"label":"Phường 1,2,7,17 - BT (cũ)","match":"Phường Gia Định"},{"label":"Phường 12,14,26 - BT (cũ)","match":"Phường Bình Thạnh"},
+    {"label":"Phường 5,11,13 - BT (cũ)","match":"Phường Bình Lợi Trung"},{"label":"Phường 19,22,25 - BT (cũ)","match":"Phường Thạnh Mỹ Tây"},{"label":"Phường 27,28 - BT (cũ)","match":"Phường Bình Quới"},
+    {"label":"Phường Gia Định (mới)","match":"Phường Gia Định"},{"label":"Phường Bình Thạnh (mới)","match":"Phường Bình Thạnh"},
+    {"label":"Phường Bình Lợi Trung (mới)","match":"Phường Bình Lợi Trung"},{"label":"Phường Thạnh Mỹ Tây (mới)","match":"Phường Thạnh Mỹ Tây"},{"label":"Phường Bình Quới (mới)","match":"Phường Bình Quới"}
+  ],
+  "Gò Vấp": [
+    {"label":"Phường 1,3 - GV (cũ)","match":"Phường Hạnh Thông"},{"label":"Phường 5,6 - GV (cũ)","match":"Phường An Nhơn"},
+    {"label":"Phường 10,17 - GV (cũ)","match":"Phường Gò Vấp"},{"label":"Phường 15,16 - GV (cũ)","match":"Phường An Hội Đông"},
+    {"label":"Phường 8,11 - GV (cũ)","match":"Phường Thông Tây Hội"},{"label":"Phường 12,14 - GV (cũ)","match":"Phường An Hội Tây"},
+    {"label":"Phường Hạnh Thông (mới)","match":"Phường Hạnh Thông"},{"label":"Phường An Nhơn (mới)","match":"Phường An Nhơn"},{"label":"Phường Gò Vấp (mới)","match":"Phường Gò Vấp"},
+    {"label":"Phường An Hội Đông (mới)","match":"Phường An Hội Đông"},{"label":"Phường Thông Tây Hội (mới)","match":"Phường Thông Tây Hội"},{"label":"Phường An Hội Tây (mới)","match":"Phường An Hội Tây"}
+  ],
+  "Phú Nhuận": [
+    {"label":"Phường 4,5,9 - PN (cũ)","match":"Phường Đức Nhuận"},{"label":"Phường 1,2,7 - PN (cũ)","match":"Phường Cầu Kiệu"},{"label":"Phường 8,10,11,13 - PN (cũ)","match":"Phường Phú Nhuận"},
+    {"label":"Phường Đức Nhuận (mới)","match":"Phường Đức Nhuận"},{"label":"Phường Cầu Kiệu (mới)","match":"Phường Cầu Kiệu"},{"label":"Phường Phú Nhuận (mới)","match":"Phường Phú Nhuận"}
+  ],
+  "Tân Bình": [
+    {"label":"Phường 1,2,3 - TB (cũ)","match":"Phường Tân Sơn Hòa"},{"label":"Phường 4,5,7 - TB (cũ)","match":"Phường Tân Sơn Nhất"},
+    {"label":"Phường 6,8,9 - TB (cũ)","match":"Phường Tân Hòa"},{"label":"Phường 10,11,12 - TB (cũ)","match":"Phường Bảy Hiền"},
+    {"label":"Phường 13,14 - TB (cũ)","match":"Phường Tân Bình"},{"label":"Phường 15 - TB (cũ)","match":"Phường Tân Sơn"},
+    {"label":"Phường Tân Sơn Hòa (mới)","match":"Phường Tân Sơn Hòa"},{"label":"Phường Tân Sơn Nhất (mới)","match":"Phường Tân Sơn Nhất"},
+    {"label":"Phường Tân Hòa (mới)","match":"Phường Tân Hòa"},{"label":"Phường Bảy Hiền (mới)","match":"Phường Bảy Hiền"},{"label":"Phường Tân Bình (mới)","match":"Phường Tân Bình"},{"label":"Phường Tân Sơn (mới)","match":"Phường Tân Sơn"}
+  ],
+  "Tân Phú": [
+    {"label":"Sơn Kỳ (cũ)","match":"Phường Tây Thạnh"},{"label":"Tây Thạnh (cũ)","match":"Phường Tây Thạnh"},
+    {"label":"Tân Sơn Nhì (cũ)","match":"Phường Tân Sơn Nhì"},{"label":"Tân Quý (cũ)","match":"Phường Phú Thọ Hòa"},
+    {"label":"Phú Thọ Hòa (cũ)","match":"Phường Phú Thọ Hòa"},{"label":"Phú Trung (cũ)","match":"Phường Tân Phú"},{"label":"Hòa Thạnh (cũ)","match":"Phường Tân Phú"},
+    {"label":"Hiệp Tân (cũ)","match":"Phường Phú Thạnh"},{"label":"Phú Thạnh (cũ)","match":"Phường Phú Thạnh"},
+    {"label":"Phường Tây Thạnh (mới)","match":"Phường Tây Thạnh"},{"label":"Phường Tân Sơn Nhì (mới)","match":"Phường Tân Sơn Nhì"},
+    {"label":"Phường Phú Thọ Hòa (mới)","match":"Phường Phú Thọ Hòa"},{"label":"Phường Tân Phú (mới)","match":"Phường Tân Phú"},{"label":"Phường Phú Thạnh (mới)","match":"Phường Phú Thạnh"}
+  ],
+  "Thủ Đức": [
+    {"label":"Hiệp Bình Chánh (cũ)","match":"Phường Hiệp Bình"},{"label":"Hiệp Bình Phước (cũ)","match":"Phường Hiệp Bình"},
+    {"label":"Bình Thọ (cũ)","match":"Phường Thủ Đức"},{"label":"Linh Chiểu (cũ)","match":"Phường Thủ Đức"},{"label":"Trường Thọ (cũ)","match":"Phường Thủ Đức"},
+    {"label":"Bình Chiểu (cũ)","match":"Phường Tam Bình"},{"label":"Tam Phú (cũ)","match":"Phường Tam Bình"},
+    {"label":"Linh Trung (cũ)","match":"Phường Linh Xuân"},{"label":"Linh Xuân (cũ)","match":"Phường Linh Xuân"},
+    {"label":"Hiệp Phú (cũ)","match":"Phường Tăng Nhơn Phú"},{"label":"Tăng Nhơn Phú A (cũ)","match":"Phường Tăng Nhơn Phú"},{"label":"Tăng Nhơn Phú B (cũ)","match":"Phường Tăng Nhơn Phú"},
+    {"label":"Long Thạnh Mỹ (cũ)","match":"Phường Long Bình"},{"label":"Long Bình (cũ)","match":"Phường Long Bình"},
+    {"label":"Trường Thạnh (cũ)","match":"Phường Long Phước"},{"label":"Long Phước (cũ)","match":"Phường Long Phước"},
+    {"label":"Phú Hữu (cũ)","match":"Phường Long Trường"},{"label":"Long Trường (cũ)","match":"Phường Long Trường"},
+    {"label":"Thạnh Mỹ Lợi (cũ)","match":"Phường Cát Lái"},{"label":"Cát Lái (cũ)","match":"Phường Cát Lái"},
+    {"label":"Bình Trưng Đông (cũ)","match":"Phường Bình Trưng"},{"label":"Bình Trưng Tây (cũ)","match":"Phường Bình Trưng"},
+    {"label":"Phước Bình (cũ)","match":"Phường Phước Long"},{"label":"Phước Long A (cũ)","match":"Phường Phước Long"},{"label":"Phước Long B (cũ)","match":"Phường Phước Long"},
+    {"label":"Thủ Thiêm (cũ)","match":"Phường An Khánh"},{"label":"An Lợi Đông (cũ)","match":"Phường An Khánh"},{"label":"Thảo Điền (cũ)","match":"Phường An Khánh"},{"label":"An Phú (cũ, TĐ)","match":"Phường An Khánh"},
+    {"label":"Phường Hiệp Bình (mới)","match":"Phường Hiệp Bình"},{"label":"Phường Thủ Đức (mới)","match":"Phường Thủ Đức"},{"label":"Phường Tam Bình (mới)","match":"Phường Tam Bình"},
+    {"label":"Phường Linh Xuân (mới)","match":"Phường Linh Xuân"},{"label":"Phường Tăng Nhơn Phú (mới)","match":"Phường Tăng Nhơn Phú"},{"label":"Phường Long Bình (mới)","match":"Phường Long Bình"},
+    {"label":"Phường Long Phước (mới)","match":"Phường Long Phước"},{"label":"Phường Long Trường (mới)","match":"Phường Long Trường"},{"label":"Phường Cát Lái (mới)","match":"Phường Cát Lái"},
+    {"label":"Phường Bình Trưng (mới)","match":"Phường Bình Trưng"},{"label":"Phường Phước Long (mới)","match":"Phường Phước Long"},{"label":"Phường An Khánh (mới)","match":"Phường An Khánh"}
+  ],
+  "Bình Chánh": [
+    {"label":"Vĩnh Lộc A (cũ)","match":"Xã Vĩnh Lộc"},{"label":"Vĩnh Lộc B (cũ)","match":"Xã Tân Vĩnh Lộc"},
+    {"label":"Lê Minh Xuân (cũ)","match":"Xã Bình Lợi"},{"label":"Tân Nhựt (cũ)","match":"Xã Tân Nhựt"},
+    {"label":"Tân Quý Tây (cũ)","match":"Xã Bình Chánh"},{"label":"Bình Chánh (cũ)","match":"Xã Bình Chánh"},{"label":"An Phú Tây (cũ)","match":"Xã Bình Chánh"},
+    {"label":"Đa Phước (cũ)","match":"Xã Hưng Long"},{"label":"Qui Đức (cũ)","match":"Xã Hưng Long"},{"label":"Hưng Long (cũ)","match":"Xã Hưng Long"},
+    {"label":"Phong Phú (cũ)","match":"Xã Bình Hưng"},{"label":"Bình Hưng (cũ)","match":"Xã Bình Hưng"},
+    {"label":"Xã Vĩnh Lộc (mới)","match":"Xã Vĩnh Lộc"},{"label":"Xã Tân Vĩnh Lộc (mới)","match":"Xã Tân Vĩnh Lộc"},{"label":"Xã Bình Lợi (mới)","match":"Xã Bình Lợi"},
+    {"label":"Xã Tân Nhựt (mới)","match":"Xã Tân Nhựt"},{"label":"Xã Bình Chánh (mới)","match":"Xã Bình Chánh"},{"label":"Xã Hưng Long (mới)","match":"Xã Hưng Long"},{"label":"Xã Bình Hưng (mới)","match":"Xã Bình Hưng"}
+  ],
+  "Cần Giờ": [
+    {"label":"Tam Thôn Hiệp (cũ)","match":"Xã Bình Khánh"},{"label":"Bình Khánh (cũ)","match":"Xã Bình Khánh"},
+    {"label":"Lý Nhơn (cũ)","match":"Xã An Thới Đông"},{"label":"An Thới Đông (cũ)","match":"Xã An Thới Đông"},
+    {"label":"Long Hòa (cũ, CG)","match":"Xã Cần Giờ"},{"label":"Cần Thạnh (cũ)","match":"Xã Cần Giờ"},
+    {"label":"Xã Bình Khánh (mới)","match":"Xã Bình Khánh"},{"label":"Xã An Thới Đông (mới)","match":"Xã An Thới Đông"},{"label":"Xã Cần Giờ (mới)","match":"Xã Cần Giờ"},{"label":"Xã Thạnh An (không đổi)","match":"Xã Thạnh An"}
+  ],
+  "Củ Chi": [
+    {"label":"Tân Phú Trung (cũ)","match":"Xã Củ Chi"},{"label":"Tân Thông Hội (cũ)","match":"Xã Củ Chi"},{"label":"Phước Vĩnh An (cũ)","match":"Xã Củ Chi"},
+    {"label":"Phước Hiệp (cũ)","match":"Xã Tân An Hội"},{"label":"Tân An Hội (cũ)","match":"Xã Tân An Hội"},
+    {"label":"Trung Lập Thượng (cũ)","match":"Xã Thái Mỹ"},{"label":"Phước Thạnh (cũ)","match":"Xã Thái Mỹ"},{"label":"Thái Mỹ (cũ)","match":"Xã Thái Mỹ"},
+    {"label":"Phú Mỹ Hưng (cũ, CC)","match":"Xã An Nhơn Tây"},{"label":"An Phú (cũ, CC)","match":"Xã An Nhơn Tây"},{"label":"An Nhơn Tây (cũ)","match":"Xã An Nhơn Tây"},
+    {"label":"Phạm Văn Cội (cũ)","match":"Xã Nhuận Đức"},{"label":"Trung Lập Hạ (cũ)","match":"Xã Nhuận Đức"},{"label":"Nhuận Đức (cũ)","match":"Xã Nhuận Đức"},
+    {"label":"Tân Thạnh Tây (cũ)","match":"Xã Phú Hòa Đông"},{"label":"Tân Thạnh Đông (cũ)","match":"Xã Phú Hòa Đông"},{"label":"Phú Hòa Đông (cũ)","match":"Xã Phú Hòa Đông"},
+    {"label":"Bình Mỹ (cũ, CC)","match":"Xã Bình Mỹ"},{"label":"Hòa Phú (cũ)","match":"Xã Bình Mỹ"},{"label":"Trung An (cũ)","match":"Xã Bình Mỹ"},
+    {"label":"Xã Củ Chi (mới)","match":"Xã Củ Chi"},{"label":"Xã Tân An Hội (mới)","match":"Xã Tân An Hội"},{"label":"Xã Thái Mỹ (mới)","match":"Xã Thái Mỹ"},
+    {"label":"Xã An Nhơn Tây (mới)","match":"Xã An Nhơn Tây"},{"label":"Xã Nhuận Đức (mới)","match":"Xã Nhuận Đức"},{"label":"Xã Phú Hòa Đông (mới)","match":"Xã Phú Hòa Đông"},{"label":"Xã Bình Mỹ (mới)","match":"Xã Bình Mỹ"}
+  ],
+  "Hóc Môn": [
+    {"label":"Thới Tam Thôn (cũ)","match":"Xã Đông Thạnh"},{"label":"Nhị Bình (cũ)","match":"Xã Đông Thạnh"},{"label":"Đông Thạnh (cũ)","match":"Xã Đông Thạnh"},
+    {"label":"Tân Hiệp (cũ, HM)","match":"Xã Hóc Môn"},{"label":"Tân Xuân (cũ)","match":"Xã Hóc Môn"},
+    {"label":"Tân Thới Nhì (cũ)","match":"Xã Xuân Thới Sơn"},{"label":"Xuân Thới Đông (cũ)","match":"Xã Xuân Thới Sơn"},{"label":"Xuân Thới Sơn (cũ)","match":"Xã Xuân Thới Sơn"},
+    {"label":"Xuân Thới Thượng (cũ)","match":"Xã Bà Điểm"},{"label":"Trung Chánh (cũ)","match":"Xã Bà Điểm"},{"label":"Bà Điểm (cũ)","match":"Xã Bà Điểm"},
+    {"label":"Xã Đông Thạnh (mới)","match":"Xã Đông Thạnh"},{"label":"Xã Hóc Môn (mới)","match":"Xã Hóc Môn"},{"label":"Xã Xuân Thới Sơn (mới)","match":"Xã Xuân Thới Sơn"},{"label":"Xã Bà Điểm (mới)","match":"Xã Bà Điểm"}
+  ],
+  "Nhà Bè": [
+    {"label":"Phú Xuân (cũ)","match":"Xã Nhà Bè"},{"label":"Phước Kiển (cũ)","match":"Xã Nhà Bè"},{"label":"Phước Lộc (cũ)","match":"Xã Nhà Bè"},
+    {"label":"Nhơn Đức (cũ)","match":"Xã Hiệp Phước"},{"label":"Long Thới (cũ)","match":"Xã Hiệp Phước"},{"label":"Hiệp Phước (cũ)","match":"Xã Hiệp Phước"},
+    {"label":"Xã Nhà Bè (mới)","match":"Xã Nhà Bè"},{"label":"Xã Hiệp Phước (mới)","match":"Xã Hiệp Phước"}
+  ]
+}

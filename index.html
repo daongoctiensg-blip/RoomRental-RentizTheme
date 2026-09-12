@@ -21,28 +21,25 @@
 </div>
 
 <div class="toolbar">
-  <select id="filterProperty" onchange="setFilterProperty(this.value)"></select>
-  <select id="filterStatus" onchange="setFilterStatus(this.value)">
-    <option value="trong">Còn trống</option>
-    <option value="">Tất cả trạng thái</option>
-    <option value="da_thue">Đã thuê</option>
-    <option value="dang_giu_cho">Đang giữ chỗ</option>
-  </select>
+  <input type="text" placeholder="Tìm mã phòng / tên khu / địa chỉ..." oninput="setSearch(this.value)" style="width:200px;">
   <select id="filterType" onchange="setFilterType(this.value)">
     <option value="phong_tro">Phòng trọ</option>
-    <option value="">Tất cả loại</option>
     <option value="can_ho">Căn hộ</option>
+    <option value="">Tất cả loại</option>
   </select>
+  <select id="filterDistrict" onchange="onDistrictChange(this.value)"></select>
+  <input type="text" id="filterWardInput" list="wardList" placeholder="Phường/Xã..." style="width:200px;" oninput="setFilterWard(this.value)">
+  <datalist id="wardList"></datalist>
   <span>Giá</span>
   <input type="number" id="filterPriceFrom" value="0" step="100000" style="width:110px;" onchange="setFilterPrice()" placeholder="Từ">
   <span>—</span>
   <input type="number" id="filterPriceTo" value="1000000000" step="100000" style="width:130px;" onchange="setFilterPrice()" placeholder="Đến">
-  <input type="text" list="wardList" placeholder="Phường/Xã..." style="width:160px;" oninput="setFilterWard(this.value)">
-  <datalist id="wardList"></datalist>
-  <input type="text" placeholder="Tìm mã phòng / tên khu / địa chỉ..." oninput="setSearch(this.value)" style="width:200px;">
+  <select id="filterProperty" onchange="setFilterProperty(this.value)"></select>
   <div class="spacer"></div>
   <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
 </div>
+
+<div id="miniDashboard" style="padding:0 28px 16px;"></div>
 
 <main id="main-content"></main>
 

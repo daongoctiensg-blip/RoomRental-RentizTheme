@@ -167,3 +167,17 @@ main { padding: 0 28px 40px; max-width: 1100px; margin: 0 auto; }
   .app-header, .toolbar, main { padding-left: 16px; padding-right: 16px; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+.dash-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.dash-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.dash-chip:hover { border-color: var(--accent); }
+.dash-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.dash-chip .n { font-weight: 600; margin-left: 4px; }

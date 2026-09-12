@@ -13,7 +13,16 @@ const VALID_ROOM_TYPE = Object.keys(ROOM_TYPE_LABEL);
 let PROPERTIES = [];
 let ROOMS = [];
 let WARDS = [];
-let filters = { propertyId: '', status: 'trong', propertyType: 'phong_tro', priceFrom: 0, priceTo: 1000000000, ward: '', q: '' };
+let DISTRICTS = {};
+let filters = { propertyId: '', status: 'trong', propertyType: 'phong_tro', priceFrom: 0, priceTo: 1000000000, district: 'Quận 7', ward: '', q: '' };
+
+const PRICE_BUCKETS = [
+  { key: 'lt3', label: '< 3tr', from: 0, to: 2999999 },
+  { key: '3_4', label: '3tr - 4tr', from: 3000000, to: 3999999 },
+  { key: '4_5', label: '4tr - 5tr', from: 4000000, to: 4999999 },
+  { key: '5_6', label: '5tr - 6tr', from: 5000000, to: 5999999 },
+  { key: 'gt6', label: '> 6tr', from: 6000000, to: 1000000000 }
+];
 
 function setFilterType(v) { filters.propertyType = v; render(); }
 function setFilterPrice() {
@@ -21,7 +30,23 @@ function setFilterPrice() {
   filters.priceTo = Number(document.getElementById('filterPriceTo').value) || 1000000000;
   render();
 }
-function setFilterWard(v) { filters.ward = v.trim(); render(); }
+function setFilterWard(v) {
+  const opts = DISTRICTS[filters.district] || [];
+  const found = opts.find(o => o.label === v);
+  filters.ward = found ? found.match : v.trim();
+  render();
+}
+function onDistrictChange(v) {
+  filters.district = v;
+  filters.ward = '';
+  document.getElementById('filterWardInput').value = '';
+  populateWardList();
+  render();
+}
+function populateWardList() {
+  const opts = DISTRICTS[filters.district] || [];
+  document.getElementById('wardList').innerHTML = opts.map(o => `<option value="${o.label}">`).join('');
+}
 
 async function loadData() {
   const data = await storeLoad();
@@ -37,19 +62,82 @@ function fmtPrice(n) {
   return Number(n).toLocaleString('vi-VN') + 'đ';
 }
 
+function matchesBaseFilters(prop, room, opts) {
+  opts = opts || {};
+  if (filters.propertyId && prop.id !== filters.propertyId) return false;
+  if (filters.propertyType && (prop.propertyType || 'phong_tro') !== filters.propertyType) return false;
+  if (filters.ward && (prop.ward || '') !== filters.ward) return false;
+  if (!opts.skipStatus && filters.status && room.status !== filters.status) return false;
+  if (!opts.skipPrice && (room.priceMonthly < filters.priceFrom || room.priceMonthly > filters.priceTo)) return false;
+  const q = filters.q.trim().toLowerCase();
+  if (q && !(room.code.toLowerCase().includes(q) || prop.name.toLowerCase().includes(q) || prop.address.toLowerCase().includes(q))) return false;
+  return true;
+}
+
+function renderDashboard() {
+  const el = document.getElementById('miniDashboard');
+  const statusCounts = { trong: 0, da_thue: 0, dang_giu_cho: 0 };
+  const bucketCounts = {};
+  PRICE_BUCKETS.forEach(b => bucketCounts[b.key] = 0);
+
+  ROOMS.forEach(r => {
+    const prop = PROPERTIES.find(p => p.id === r.propertyId);
+    if (!prop) return;
+    if (matchesBaseFilters(prop, r, { skipStatus: true })) {
+      statusCounts[r.status] = (statusCounts[r.status] || 0) + 1;
+    }
+    if (matchesBaseFilters(prop, r, { skipPrice: true })) {
+      const b = PRICE_BUCKETS.find(bb => r.priceMonthly >= bb.from && r.priceMonthly <= bb.to);
+      if (b) bucketCounts[b.key]++;
+    }
+  });
+
+  const statusHtml = `
+    <div class="dash-row">
+      ${['trong','da_thue','dang_giu_cho'].map(s => `
+        <div class="dash-chip ${filters.status === s ? 'active' : ''}" onclick="setFilterStatus('${s}')">
+          ${STATUS_LABEL[s]}<span class="n">${statusCounts[s]}</span>
+        </div>
+      `).join('')}
+      <div class="dash-chip ${filters.status === '' ? 'active' : ''}" onclick="setFilterStatus('')">Tất cả<span class="n">${statusCounts.trong + statusCounts.da_thue + statusCounts.dang_giu_cho}</span></div>
+    </div>`;
+
+  const currentBucket = PRICE_BUCKETS.find(b => b.from === filters.priceFrom && b.to === filters.priceTo);
+  const priceHtml = `
+    <div class="dash-row">
+      ${PRICE_BUCKETS.map(b => `
+        <div class="dash-chip ${currentBucket && currentBucket.key === b.key ? 'active' : ''}" onclick="setPriceBucket('${b.key}')">
+          ${b.label}<span class="n">${bucketCounts[b.key]}</span>
+        </div>
+      `).join('')}
+    </div>`;
+
+  el.innerHTML = statusHtml + priceHtml;
+}
+
+function setFilterStatus(v) { filters.status = v; render(); }
+function setPriceBucket(key) {
+  const b = PRICE_BUCKETS.find(x => x.key === key);
+  if (!b) return;
+  filters.priceFrom = b.from;
+  filters.priceTo = b.to;
+  document.getElementById('filterPriceFrom').value = b.from;
+  document.getElementById('filterPriceTo').value = b.to;
+  render();
+}
+
 // ── Render ────────────────────────────────────────────────
 function render() {
+  renderDashboard();
   const el = document.getElementById('main-content');
   const propSelect = document.getElementById('filterProperty');
   propSelect.innerHTML = '<option value="">Tất cả khu</option>' +
     PROPERTIES.map(p => `<option value="${p.id}" ${filters.propertyId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
 
-  const q = filters.q.trim().toLowerCase();
-  const wardQ = filters.ward.toLowerCase();
   const visibleProperties = PROPERTIES.filter(p => {
     if (filters.propertyId && p.id !== filters.propertyId) return false;
     if (filters.propertyType && (p.propertyType || 'phong_tro') !== filters.propertyType) return false;
-    if (wardQ && !(p.ward || '').toLowerCase().includes(wardQ)) return false;
+    if (filters.ward && (p.ward || '') !== filters.ward) return false;
     return true;
   });
 
@@ -63,16 +151,7 @@ function render() {
   let totalShown = 0;
 
   visibleProperties.forEach(prop => {
-    let rooms = ROOMS.filter(r => r.propertyId === prop.id);
-    if (filters.status) rooms = rooms.filter(r => r.status === filters.status);
-    rooms = rooms.filter(r => r.priceMonthly >= filters.priceFrom && r.priceMonthly <= filters.priceTo);
-    if (q) {
-      rooms = rooms.filter(r =>
-        r.code.toLowerCase().includes(q) ||
-        prop.name.toLowerCase().includes(q) ||
-        prop.address.toLowerCase().includes(q)
-      );
-    }
+    let rooms = ROOMS.filter(r => r.propertyId === prop.id && matchesBaseFilters(prop, r));
     if (!rooms.length) return;
     totalShown += rooms.length;
 
@@ -113,7 +192,6 @@ function render() {
 
 // ── Filters ───────────────────────────────────────────────
 function setFilterProperty(v) { filters.propertyId = v; render(); }
-function setFilterStatus(v) { filters.status = v; render(); }
 function setSearch(v) { filters.q = v; render(); }
 
 // ── Room modal (add/edit) ────────────────────────────────
@@ -382,7 +460,10 @@ async function resetSampleData() {
   await loadData();
   try {
     WARDS = await fetch('data/wards_hcm.json').then(r => r.json());
-    document.getElementById('wardList').innerHTML = WARDS.map(w => `<option value="${w}">`).join('');
-  } catch (e) { /* danh sach phuong khong tai duoc, khong chan render chinh */ }
+    DISTRICTS = await fetch('data/districts_hcm.json').then(r => r.json());
+    const districtSelect = document.getElementById('filterDistrict');
+    districtSelect.innerHTML = Object.keys(DISTRICTS).map(d => `<option value="${d}" ${d === filters.district ? 'selected' : ''}>${d}</option>`).join('');
+    populateWardList();
+  } catch (e) { /* danh sach quan/phuong khong tai duoc, khong chan render chinh */ }
   render();
 })();
