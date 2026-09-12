@@ -12,7 +12,16 @@ const VALID_ROOM_TYPE = Object.keys(ROOM_TYPE_LABEL);
 
 let PROPERTIES = [];
 let ROOMS = [];
-let filters = { propertyId: '', status: '', q: '' };
+let WARDS = [];
+let filters = { propertyId: '', status: 'trong', propertyType: 'phong_tro', priceFrom: 0, priceTo: 1000000000, ward: '', q: '' };
+
+function setFilterType(v) { filters.propertyType = v; render(); }
+function setFilterPrice() {
+  filters.priceFrom = Number(document.getElementById('filterPriceFrom').value) || 0;
+  filters.priceTo = Number(document.getElementById('filterPriceTo').value) || 1000000000;
+  render();
+}
+function setFilterWard(v) { filters.ward = v.trim(); render(); }
 
 async function loadData() {
   const data = await storeLoad();
@@ -36,10 +45,16 @@ function render() {
     PROPERTIES.map(p => `<option value="${p.id}" ${filters.propertyId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
 
   const q = filters.q.trim().toLowerCase();
-  const visibleProperties = PROPERTIES.filter(p => !filters.propertyId || p.id === filters.propertyId);
+  const wardQ = filters.ward.toLowerCase();
+  const visibleProperties = PROPERTIES.filter(p => {
+    if (filters.propertyId && p.id !== filters.propertyId) return false;
+    if (filters.propertyType && (p.propertyType || 'phong_tro') !== filters.propertyType) return false;
+    if (wardQ && !(p.ward || '').toLowerCase().includes(wardQ)) return false;
+    return true;
+  });
 
   if (!visibleProperties.length) {
-    el.innerHTML = '<div class="empty-state">Chưa có khu/property nào. Bấm "+ Thêm khu" để bắt đầu.</div>';
+    el.innerHTML = '<div class="empty-state">Không có khu nào khớp bộ lọc.</div>';
     document.getElementById('roomCount').textContent = 0;
     return;
   }
@@ -50,6 +65,7 @@ function render() {
   visibleProperties.forEach(prop => {
     let rooms = ROOMS.filter(r => r.propertyId === prop.id);
     if (filters.status) rooms = rooms.filter(r => r.status === filters.status);
+    rooms = rooms.filter(r => r.priceMonthly >= filters.priceFrom && r.priceMonthly <= filters.priceTo);
     if (q) {
       rooms = rooms.filter(r =>
         r.code.toLowerCase().includes(q) ||
@@ -234,6 +250,13 @@ function openPropertyModal(propertyId) {
         <div class="field-error" id="err_name">Bắt buộc nhập tên</div>
       </div>
       <div class="form-row">
+        <label>Loại hình</label>
+        <select id="pf_propertyType">
+          <option value="phong_tro" ${!prop || prop.propertyType === 'phong_tro' ? 'selected' : ''}>Phòng trọ</option>
+          <option value="can_ho" ${prop && prop.propertyType === 'can_ho' ? 'selected' : ''}>Căn hộ</option>
+        </select>
+      </div>
+      <div class="form-row">
         <label>Địa chỉ *</label>
         <input id="pf_address" value="${prop ? prop.address : ''}">
         <div class="field-error" id="err_address">Bắt buộc nhập địa chỉ</div>
@@ -241,11 +264,11 @@ function openPropertyModal(propertyId) {
       <div class="form-grid-2">
         <div class="form-row">
           <label>Phường/Xã</label>
-          <input id="pf_ward" value="${prop ? prop.ward : ''}">
+          <input id="pf_ward" list="wardList" value="${prop ? prop.ward : ''}">
         </div>
         <div class="form-row">
           <label>Tỉnh/Thành phố</label>
-          <input id="pf_city" value="${prop ? prop.city : ''}">
+          <input id="pf_city" value="${prop ? prop.city : 'Thành phố Hồ Chí Minh'}">
         </div>
       </div>
       <div class="form-row">
@@ -298,6 +321,7 @@ function saveProperty(propertyId) {
   const split = id => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
   const payload = {
     name: document.getElementById('pf_name').value.trim(),
+    propertyType: document.getElementById('pf_propertyType').value,
     address: document.getElementById('pf_address').value.trim(),
     ward: document.getElementById('pf_ward').value.trim(),
     city: document.getElementById('pf_city').value.trim(),
@@ -356,5 +380,9 @@ async function resetSampleData() {
 // ── Init ──────────────────────────────────────────────────
 (async function init() {
   await loadData();
+  try {
+    WARDS = await fetch('data/wards_hcm.json').then(r => r.json());
+    document.getElementById('wardList').innerHTML = WARDS.map(w => `<option value="${w}">`).join('');
+  } catch (e) { /* danh sach phuong khong tai duoc, khong chan render chinh */ }
   render();
 })();

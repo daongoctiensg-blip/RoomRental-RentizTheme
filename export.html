@@ -93,7 +93,10 @@ async function render() {
         </div>
       `).join('')}
       ${renderPolicyBlocks(prop)}
-      <div class="contact">📞 Liên hệ: ${prop.phone}</div>
+      <div class="contact">
+        <a href="tel:${prop.phone}" style="margin-right:12px;">📞 Gọi ${prop.phone}</a>
+        <a href="https://zalo.me/${prop.phone.replace(/\\D/g,'')}" target="_blank">💬 Chat Zalo</a>
+      </div>
     `;
   } else if (type === 'room') {
     const room = rooms.find(r => r.id === id);
@@ -108,7 +111,10 @@ async function render() {
       </div>
       ${room.notes ? `<p>${room.notes}</p>` : ''}
       ${renderPolicyBlocks(prop)}
-      <div class="contact">📞 Liên hệ: ${prop.phone}</div>
+      <div class="contact">
+        <a href="tel:${prop.phone}" style="margin-right:12px;">📞 Gọi ${prop.phone}</a>
+        <a href="https://zalo.me/${prop.phone.replace(/\\D/g,'')}" target="_blank">💬 Chat Zalo</a>
+      </div>
     `;
   } else {
     document.getElementById('content').innerHTML = 'Thiếu tham số type/id.';

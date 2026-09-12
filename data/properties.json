@@ -2,6 +2,7 @@
   {
     "id": "P001",
     "name": "CHDV Lô C6, Khu dân cư Nam Long",
+    "propertyType": "phong_tro",
     "address": "Lô C6, Khu dân cư Nam Long, Khu phố 2",
     "ward": "Phường Phú Thuận",
     "city": "Thành phố Hồ Chí Minh",
