@@ -1,0 +1,62 @@
+[
+  {
+    "id": "R001",
+    "propertyId": "P001",
+    "floor": "Trệt",
+    "code": "T002",
+    "roomType": "ben_trong",
+    "areaM2": 26,
+    "priceMonthly": 6200000,
+    "status": "trong",
+    "images": [],
+    "notes": ""
+  },
+  {
+    "id": "R002",
+    "propertyId": "P001",
+    "floor": "Lầu 1",
+    "code": "L101",
+    "roomType": "ban_cong",
+    "areaM2": 32,
+    "priceMonthly": 7500000,
+    "status": "trong",
+    "images": [],
+    "notes": ""
+  },
+  {
+    "id": "R003",
+    "propertyId": "P001",
+    "floor": "Lầu 1",
+    "code": "L102",
+    "roomType": "ben_trong",
+    "areaM2": 20,
+    "priceMonthly": 4900000,
+    "status": "trong",
+    "images": [],
+    "notes": ""
+  },
+  {
+    "id": "R004",
+    "propertyId": "P001",
+    "floor": "Lầu 2",
+    "code": "L201",
+    "roomType": "ban_cong",
+    "areaM2": 34,
+    "priceMonthly": 8000000,
+    "status": "trong",
+    "images": [],
+    "notes": "Có 2 phòng ngủ với 2 bộ nội thất riêng"
+  },
+  {
+    "id": "R005",
+    "propertyId": "P001",
+    "floor": "Lầu 2",
+    "code": "L202",
+    "roomType": "ben_trong",
+    "areaM2": 20,
+    "priceMonthly": 5200000,
+    "status": "trong",
+    "images": [],
+    "notes": ""
+  }
+]

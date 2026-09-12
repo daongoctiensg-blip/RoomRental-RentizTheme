@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý phòng trọ / căn hộ</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<script src="js/keygate.js"></script>
+
+
+<div class="app-header">
+  <div>
+    <h1>Quản lý phòng trọ / căn hộ</h1>
+    <div class="sub">Công cụ nội bộ — không dùng để khách xem trực tiếp</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a class="btn" href="/api/backup" download>Tải backup data</a>
+    <button class="btn" onclick="openPropertyModal(null)">+ Thêm khu</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <select id="filterProperty" onchange="setFilterProperty(this.value)"></select>
+  <select onchange="setFilterStatus(this.value)">
+    <option value="">Tất cả trạng thái</option>
+    <option value="trong">Còn trống</option>
+    <option value="da_thue">Đã thuê</option>
+    <option value="dang_giu_cho">Đang giữ chỗ</option>
+  </select>
+  <input type="text" placeholder="Tìm mã phòng / tên khu..." oninput="setSearch(this.value)">
+  <div class="spacer"></div>
+  <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
+</div>
+
+<main id="main-content"></main>
+
+<script src="js/app.js"></script>
+</body>
+</html>

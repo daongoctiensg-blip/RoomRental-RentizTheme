@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Xuất tin đăng</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; color: #23281f; max-width: 680px; margin: 0 auto; padding: 32px 24px; line-height: 1.6; }
+  h1 { font-family: 'Source Serif 4', serif; font-size: 22px; margin: 0 0 4px; }
+  .addr { color: #5b6152; margin-bottom: 16px; }
+  .promo { background: #f4ecd7; border: 1px solid #8a6a1f; color: #6b5216; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+  h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1px solid #ddd8c8; padding-bottom: 4px; }
+  ul { margin: 0; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  .room-line { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #ddd8c8; font-size: 14px; }
+  .room-line .code { font-weight: 600; }
+  .price { color: #8a6a35; font-weight: 600; }
+  .contact { margin-top: 20px; font-size: 15px; font-weight: 600; }
+  .toolbar-print { text-align: center; margin-bottom: 20px; }
+  .toolbar-print button { padding: 8px 16px; border-radius: 6px; border: 1px solid #3c5b42; background: #3c5b42; color: #fff; cursor: pointer; font-size: 14px; }
+  @media print { .toolbar-print { display: none; } body { padding: 0; } }
+</style>
+</head>
+<body>
+<script src="js/keygate.js"></script>
+
+
+<div class="toolbar-print"><button onclick="window.print()">In / Xuất PDF</button></div>
+<div id="content">Đang tải...</div>
+
+<script>
+const API = '/api';
+const params = new URLSearchParams(location.search);
+const type = params.get('type');
+const id = params.get('id');
+
+function fmtPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+const ROOM_TYPE_LABEL = { ban_cong: 'Ban công', ben_trong: 'Bên trong' };
+
+function isPromoActive(promo) {
+  if (!promo || !promo.text) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  if (promo.validFrom && today < promo.validFrom) return false;
+  if (promo.validTo && today > promo.validTo) return false;
+  return true;
+}
+
+function renderPolicyBlocks(prop) {
+  let html = '';
+  if (prop.amenities && prop.amenities.length) {
+    html += `<h2>Tiện ích</h2><ul>${prop.amenities.map(a => `<li>${a}</li>`).join('')}</ul>`;
+  }
+  if (prop.utilityFees && Object.keys(prop.utilityFees).length) {
+    const f = prop.utilityFees;
+    html += `<h2>Phí dịch vụ</h2><ul>
+      ${f.electricity ? `<li>Điện: ${f.electricity}</li>` : ''}
+      ${f.water ? `<li>Nước: ${f.water}</li>` : ''}
+      ${f.service ? `<li>Phí dịch vụ: ${f.service}</li>` : ''}
+    </ul>`;
+  }
+  if (prop.nearby && prop.nearby.length) {
+    html += `<h2>Di chuyển</h2><ul>${prop.nearby.map(a => `<li>${a}</li>`).join('')}</ul>`;
+  }
+  if (prop.depositPolicy && prop.depositPolicy.length) {
+    html += `<h2>Chính sách cọc</h2><ul>${prop.depositPolicy.map(a => `<li>${a}</li>`).join('')}</ul>`;
+  }
+  if (prop.commissionPolicy && prop.commissionPolicy.length) {
+    html += `<h2>Hoa hồng</h2><ul>${prop.commissionPolicy.map(a => `<li>${a}</li>`).join('')}</ul>`;
+  }
+  if (prop.notes) {
+    html += `<h2>Lưu ý</h2><p>${prop.notes}</p>`;
+  }
+  return html;
+}
+
+async function render() {
+  const [propsRes, roomsRes] = await Promise.all([fetch(`${API}/properties`), fetch(`${API}/rooms`)]);
+  const properties = await propsRes.json();
+  const rooms = await roomsRes.json();
+
+  if (type === 'property') {
+    const prop = properties.find(p => p.id === id);
+    if (!prop) { document.getElementById('content').innerHTML = 'Không tìm thấy khu này.'; return; }
+    const propRooms = rooms.filter(r => r.propertyId === prop.id);
+    document.getElementById('content').innerHTML = `
+      <h1>${prop.name}</h1>
+      <div class="addr">${prop.address}, ${prop.ward}, ${prop.city}</div>
+      ${isPromoActive(prop.promotion) ? `<div class="promo">${prop.promotion.text} — áp dụng đến ${prop.promotion.validTo}</div>` : ''}
+      <h2>Thông tin chung</h2>
+      ${propRooms.filter(r => r.status !== 'da_thue').map(r => `
+        <div class="room-line">
+          <span><span class="code">${r.floor} – ${r.code}</span> · ${ROOM_TYPE_LABEL[r.roomType] || r.roomType}: ${r.areaM2}m²</span>
+          <span class="price">${fmtPrice(r.priceMonthly)}/tháng</span>
+        </div>
+      `).join('')}
+      ${renderPolicyBlocks(prop)}
+      <div class="contact">📞 Liên hệ: ${prop.phone}</div>
+    `;
+  } else if (type === 'room') {
+    const room = rooms.find(r => r.id === id);
+    if (!room) { document.getElementById('content').innerHTML = 'Không tìm thấy phòng này.'; return; }
+    const prop = properties.find(p => p.id === room.propertyId);
+    document.getElementById('content').innerHTML = `
+      <h1>${prop.name} — ${room.floor} ${room.code}</h1>
+      <div class="addr">${prop.address}, ${prop.ward}, ${prop.city}</div>
+      <div class="room-line">
+        <span>${ROOM_TYPE_LABEL[room.roomType] || room.roomType} · ${room.areaM2}m²</span>
+        <span class="price">${fmtPrice(room.priceMonthly)}/tháng</span>
+      </div>
+      ${room.notes ? `<p>${room.notes}</p>` : ''}
+      ${renderPolicyBlocks(prop)}
+      <div class="contact">📞 Liên hệ: ${prop.phone}</div>
+    `;
+  } else {
+    document.getElementById('content').innerHTML = 'Thiếu tham số type/id.';
+  }
+}
+render();
+</script>
+</body>
+</html>

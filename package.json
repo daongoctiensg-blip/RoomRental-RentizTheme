@@ -1,0 +1,12 @@
+{
+  "name": "room-rental",
+  "version": "1.0.0",
+  "description": "Cong cu noi bo quan ly danh sach phong tro / can ho cho thue",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
