@@ -16,12 +16,13 @@
   </div>
   <div style="display:flex;gap:8px;">
     <button class="btn" onclick="resetSampleData()">Nạp lại data mẫu</button>
-    <button class="btn" onclick="openPropertyModal(null)">+ Thêm khu</button>
+    <button class="btn" onclick="openRoomModal(null, null)">+ Thêm phòng</button>
+    <button class="btn" onclick="openPropertyModal(null)">+ Thêm nhà</button>
   </div>
 </div>
 
 <div class="toolbar">
-  <input type="text" placeholder="Tìm mã phòng / tên khu / địa chỉ..." oninput="setSearch(this.value)" style="width:200px;">
+  <input type="text" placeholder="Tìm mã phòng / địa chỉ..." oninput="setSearch(this.value)" style="width:200px;">
   <select id="filterType" onchange="setFilterType(this.value)">
     <option value="phong_tro">Phòng trọ</option>
     <option value="can_ho">Căn hộ</option>
@@ -39,6 +40,7 @@
   <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
 </div>
 
+<div id="propertyActionsBar" class="property-actions-bar"></div>
 <div id="miniDashboard" style="padding:0 28px 16px;"></div>
 
 <main id="main-content"></main>

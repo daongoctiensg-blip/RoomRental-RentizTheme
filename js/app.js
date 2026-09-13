@@ -153,74 +153,76 @@ function render() {
   renderDashboard();
   const el = document.getElementById('main-content');
   const propSelect = document.getElementById('filterProperty');
-  propSelect.innerHTML = '<option value="">Tất cả khu</option>' +
+  propSelect.innerHTML = '<option value="">Tất cả nhà</option>' +
     PROPERTIES.map(p => `<option value="${p.id}" ${filters.propertyId === p.id ? 'selected' : ''}>${p.soNha}</option>`).join('');
 
-  const visibleProperties = PROPERTIES.filter(p => {
-    if (filters.propertyId && p.id !== filters.propertyId) return false;
-    if (filters.propertyType && (p.propertyType || 'phong_tro') !== filters.propertyType) return false;
-    if (filters.ward && (p.ward || '') !== filters.ward) return false;
-    return true;
+  renderPropertyActionsBar();
+
+  // Danh sách phẳng: không gộp theo nhà, chỉ trả về các phòng khớp tiêu chí
+  const matchedRooms = [];
+  ROOMS.forEach(r => {
+    const prop = PROPERTIES.find(p => p.id === r.propertyId);
+    if (!prop) return;
+    if (!matchesBaseFilters(prop, r)) return;
+    matchedRooms.push({ room: r, prop });
   });
 
-  if (!visibleProperties.length) {
-    el.innerHTML = '<div class="empty-state">Không có khu nào khớp bộ lọc.</div>';
-    document.getElementById('roomCount').textContent = 0;
+  // Sắp theo nhà (địa chỉ) rồi tầng/mã, để các phòng cùng nhà vẫn đứng gần nhau dù không có tiêu đề gộp
+  matchedRooms.sort((a, b) => {
+    const byAddr = a.prop.soNha.localeCompare(b.prop.soNha);
+    if (byAddr !== 0) return byAddr;
+    return String(a.room.floor).localeCompare(String(b.room.floor)) || a.room.code.localeCompare(b.room.code);
+  });
+
+  document.getElementById('roomCount').textContent = matchedRooms.length;
+
+  if (!matchedRooms.length) {
+    el.innerHTML = '<div class="empty-state">Không tìm thấy phòng phù hợp bộ lọc.</div>';
     return;
   }
 
-  let html = '';
-  let totalShown = 0;
-
-  visibleProperties.forEach(prop => {
-    let rooms = ROOMS.filter(r => r.propertyId === prop.id && matchesBaseFilters(prop, r));
-    if (!rooms.length) return;
-    totalShown += rooms.length;
-
-    html += `
-      <div class="property-block">
-        <div class="property-head">
-          <div>
-            <h2>${prop.soNha}</h2>
-            <div class="addr">${fullAddress(prop)}</div>
+  el.innerHTML = `
+    <div class="room-grid">
+      ${matchedRooms.map(({ room: r, prop }) => {
+        const img = (r.images && r.images[0]) || '';
+        return `
+        <div class="room-card">
+          <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
+          <div class="room-card-img${img ? '' : ' placeholder'}"${img ? ` onclick="event.stopPropagation(); openLightbox('${img}')"` : ''}>
+            ${img ? `<img src="${img}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
           </div>
-          <div class="property-actions">
-            <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa khu</button>
-            <button class="btn btn-sm" onclick="openRoomModal(null, '${prop.id}')">+ Thêm phòng</button>
-            <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả khu</button>
-          </div>
-        </div>
-        <div class="room-grid">
-          ${rooms.map(r => {
-            const img = (r.images && r.images[0]) || '';
-            return `
-            <div class="room-card">
-              <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
-              <div class="room-card-img${img ? '' : ' placeholder'}"${img ? ` onclick="event.stopPropagation(); openLightbox('${img}')"` : ''}>
-                ${img ? `<img src="${img}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
-              </div>
-              <div onclick="openRoomModal('${r.id}')">
-                <div class="floor">${r.floor}</div>
-                <div class="code">${r.code}</div>
-                <div class="meta">
-                  <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
-                  <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
-                </div>
-                <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
-              </div>
-              <button class="btn btn-sm" style="margin-top:8px;" onclick="exportRoom('${r.id}')">Xuất PDF phòng này</button>
+          <div onclick="openRoomModal('${r.id}')">
+            <div class="room-addr">${prop.soNha}</div>
+            <div class="floor">${r.floor}</div>
+            <div class="code">${r.code}</div>
+            <div class="meta">
+              <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
+              <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
             </div>
-          `;
-          }).join('')}
+            <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+          </div>
+          <button class="btn btn-sm" style="margin-top:8px;" onclick="exportRoom('${r.id}')">Xuất PDF phòng này</button>
         </div>
-      </div>
-    `;
-  });
-
-  document.getElementById('roomCount').textContent = totalShown;
-  el.innerHTML = html || '<div class="empty-state">Không tìm thấy phòng phù hợp bộ lọc.</div>';
+      `;
+      }).join('')}
+    </div>
+  `;
 }
 
+function renderPropertyActionsBar() {
+  const bar = document.getElementById('propertyActionsBar');
+  if (!bar) return;
+  if (!filters.propertyId) { bar.innerHTML = ''; return; }
+  const prop = PROPERTIES.find(p => p.id === filters.propertyId);
+  if (!prop) { bar.innerHTML = ''; return; }
+  bar.innerHTML = `
+    <div class="addr">${fullAddress(prop)}</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa nhà</button>
+      <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
+    </div>
+  `;
+}
 // ── Filters ───────────────────────────────────────────────
 function setFilterProperty(v) { filters.propertyId = v; render(); }
 function setSearch(v) { filters.q = v; render(); }
@@ -235,7 +237,7 @@ function openRoomModal(roomId, presetPropertyId) {
     <div class="modal-box">
       <h2>${room ? 'Sửa phòng ' + room.code : 'Thêm phòng mới'}</h2>
       <div class="form-row">
-        <label>Thuộc khu</label>
+        <label>Thuộc nhà</label>
         <select id="f_propertyId">
           ${PROPERTIES.map(p => `<option value="${p.id}" ${((room && room.propertyId === p.id) || presetPropertyId === p.id) ? 'selected' : ''}>${p.soNha}</option>`).join('')}
         </select>
@@ -352,7 +354,7 @@ function openPropertyModal(propertyId) {
   overlay.id = 'propertyModalOverlay';
   overlay.innerHTML = `
     <div class="modal-box">
-      <h2>${prop ? 'Sửa khu: ' + prop.soNha : 'Thêm khu mới'}</h2>
+      <h2>${prop ? 'Sửa nhà: ' + prop.soNha : 'Thêm nhà mới'}</h2>
       <div class="form-row">
         <label>Loại hình</label>
         <select id="pf_propertyType">
@@ -404,7 +406,7 @@ function openPropertyModal(propertyId) {
         <textarea id="pf_notes">${prop ? prop.notes || '' : ''}</textarea>
       </div>
       <div class="modal-actions">
-        ${prop ? `<button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Xoá khu</button>` : ''}
+        ${prop ? `<button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Xoá nhà</button>` : ''}
         <button class="btn" onclick="closeModal('propertyModalOverlay')">Đóng</button>
         <button class="btn btn-primary" onclick="saveProperty(${prop ? `'${prop.id}'` : 'null'})">Lưu</button>
       </div>
@@ -454,7 +456,7 @@ function deleteProperty(propertyId) {
     alert('Property này còn phòng bên trong — xoá hết phòng trước khi xoá property');
     return;
   }
-  if (!confirm('Xoá khu này? Không thể hoàn tác.')) return;
+  if (!confirm('Xoá nhà này? Không thể hoàn tác. (phải xoá hết phòng bên trong trước)')) return;
   PROPERTIES = PROPERTIES.filter(p => p.id !== propertyId);
   persist();
   closeModal('propertyModalOverlay');

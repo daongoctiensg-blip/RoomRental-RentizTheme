@@ -95,7 +95,7 @@ async function render() {
 
   if (type === 'property') {
     const prop = properties.find(p => p.id === id);
-    if (!prop) { document.getElementById('content').innerHTML = 'Không tìm thấy khu này.'; return; }
+    if (!prop) { document.getElementById('content').innerHTML = 'Không tìm thấy nhà này.'; return; }
     const propRooms = rooms.filter(r => r.propertyId === prop.id);
     const visibleRooms = propRooms.filter(r => r.status !== 'da_thue');
     const heroImg = visibleRooms.map(r => r.images && r.images[0]).find(Boolean);
