@@ -78,14 +78,20 @@ function renderPolicyBlocks(prop) {
   if (prop.nearby && prop.nearby.length) {
     html += `<h2>Di chuyển</h2><ul>${prop.nearby.map(a => `<li>${a}</li>`).join('')}</ul>`;
   }
-  if (prop.depositPolicy && prop.depositPolicy.length) {
-    html += `<h2>Chính sách cọc</h2><ul>${prop.depositPolicy.map(a => `<li>${a}</li>`).join('')}</ul>`;
+  return html;
+}
+
+// Cọc/hoa hồng giờ thuộc về từng phòng (mỗi phòng có thể khác nhau), không còn ở nhà
+function renderRoomPolicyBlocks(room) {
+  let html = '';
+  if (room.depositPolicy && (room.depositPolicy.months || room.depositPolicy.note)) {
+    html += `<h2>Chính sách cọc</h2><ul>`;
+    if (room.depositPolicy.months) html += `<li>Cọc: ${room.depositPolicy.months} tháng</li>`;
+    if (room.depositPolicy.note) html += `<li>${room.depositPolicy.note}</li>`;
+    html += `</ul>`;
   }
-  if (prop.commissionPolicy && prop.commissionPolicy.length) {
-    html += `<h2>Hoa hồng</h2><ul>${prop.commissionPolicy.map(a => `<li>${a}</li>`).join('')}</ul>`;
-  }
-  if (prop.notes) {
-    html += `<h2>Lưu ý</h2><p>${prop.notes}</p>`;
+  if (room.commissionPolicy && room.commissionPolicy.length) {
+    html += `<h2>Hoa hồng</h2><ul>${room.commissionPolicy.map(c => `<li>Hợp đồng ${c.termMonths} tháng: hoa hồng ${c.percent}%</li>`).join('')}</ul>`;
   }
   return html;
 }
@@ -103,14 +109,17 @@ async function render() {
       <h1>${prop.soNha}</h1>
       <div class="addr">${fullAddress(prop)}</div>
       ${heroImg ? `<img class="hero-img" src="${heroImg}" alt="">` : ''}
-      ${isPromoActive(prop.promotion) ? `<div class="promo">${prop.promotion.text} — áp dụng đến ${prop.promotion.validTo}</div>` : ''}
       <h2>Thông tin chung</h2>
       ${visibleRooms.map(r => {
         const thumb = r.images && r.images[0];
+        const promoActive = isPromoActive(r.promotion);
         return `
         <div class="room-line">
           ${thumb ? `<img class="thumb" src="${thumb}" alt="">` : ''}
-          <div class="room-line-info"><span class="code">${r.floor} – ${r.code}</span> · ${ROOM_TYPE_LABEL[r.roomType] || r.roomType}: ${r.areaM2}m²</div>
+          <div class="room-line-info">
+            <span class="code">${r.floor} – ${r.code}</span> · ${ROOM_TYPE_LABEL[r.roomType] || r.roomType}: ${r.areaM2}m²
+            ${promoActive ? `<div style="color:#8a6a1f;font-size:12px;margin-top:2px;">🎉 ${r.promotion.text}</div>` : ''}
+          </div>
           <span class="price">${fmtPrice(r.priceMonthly)}/tháng</span>
         </div>
       `;
@@ -129,12 +138,14 @@ async function render() {
       <h1>${prop.soNha} — ${room.floor} ${room.code}</h1>
       <div class="addr">${fullAddress(prop)}</div>
       ${room.images && room.images.length ? `<div class="room-gallery">${room.images.map(u => `<img src="${u}" alt="">`).join('')}</div>` : ''}
+      ${isPromoActive(room.promotion) ? `<div class="promo">${room.promotion.text} — áp dụng đến ${room.promotion.validTo}</div>` : ''}
       <div class="room-line">
         <div class="room-line-info">${ROOM_TYPE_LABEL[room.roomType] || room.roomType} · ${room.areaM2}m²</div>
         <span class="price">${fmtPrice(room.priceMonthly)}/tháng</span>
       </div>
       ${room.notes ? `<p>${room.notes}</p>` : ''}
       ${renderPolicyBlocks(prop)}
+      ${renderRoomPolicyBlocks(room)}
       <div class="contact">
         <a href="tel:${prop.phone}" style="margin-right:12px;">📞 Gọi ${prop.phone}</a>
         <a href="https://zalo.me/${prop.phone.replace(/\\D/g,'')}" target="_blank">💬 Chat Zalo</a>

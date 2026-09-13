@@ -15,6 +15,22 @@ const ICON_AREA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const ICON_DOOR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
 const ICON_HOUSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>';
 
+// ── Icons cho label form (chỉ để dễ nhìn, không mang nghĩa) ──
+const ICON_LBL_TYPE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>';
+const ICON_LBL_PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.2"/></svg>';
+const ICON_LBL_PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6.5 3h3l1.2 4.5-2 1.5a13 13 0 0 0 6.3 6.3l1.5-2 4.5 1.2v3c0 1-.9 1.7-1.9 1.5C11.4 18 6 12.6 5 5.9 4.8 4.9 5.5 4 6.5 3z"/></svg>';
+const ICON_LBL_AMENITY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3z"/><path d="M19 15l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8.8-1.9z"/></svg>';
+const ICON_LBL_NEARBY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 5-5 2 2-5 5-2z"/></svg>';
+const ICON_LBL_DEPOSIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 10c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.6c0 2.2-5 1.6-5 4 0 1 1 1.7 2.5 1.7s2.5-.7 2.5-1.6"/><path d="M12 6.5v11"/></svg>';
+const ICON_LBL_COMMISSION = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M18 6 6 18"/></svg>';
+const ICON_LBL_PROMO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 12 12 20 4 12l3-7h10l3 7z"/><path d="M4 12h16"/></svg>';
+const ICON_LBL_NOTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>';
+const ICON_LBL_FLOOR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>';
+const ICON_LBL_CODE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 3 7 21M17 3l-2 18M4 8h5M15 8h5M3 16h5M14 16h5"/></svg>';
+const ICON_LBL_PRICE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1 1-1.8 2.5-1.8s2.5.8 2.5 1.7c0 2.3-5 1.7-5 4.2 0 1 1 1.8 2.5 1.8s2.5-.8 2.5-1.7"/></svg>';
+const ICON_LBL_STATUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21V4l13 3-13 3"/></svg>';
+const ICON_LBL_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-5 4 4 3-3 4 4"/></svg>';
+
 // ── Lightbox (xem ảnh to, vanilla — không thêm thư viện) ────
 function openLightbox(url) {
   if (!url) return;
@@ -132,6 +148,14 @@ function fullAddress(prop) {
   if (prop.quan) parts.push(prop.quan);
   parts.push(prop.city);
   return parts.filter(Boolean).join(', ');
+}
+
+function isPromoActive(promo) {
+  if (!promo || !promo.text) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  if (promo.validFrom && today < promo.validFrom) return false;
+  if (promo.validTo && today > promo.validTo) return false;
+  return true;
 }
 
 function matchesBaseFilters(prop, room, opts) {
@@ -357,8 +381,11 @@ function setManageId(v) { manageId = v; renderManageBar(); }
 function setSearch(v) { detailView = null; filters.q = v; render(); }
 
 // ── Room modal (add/edit) ────────────────────────────────
+let commissionRowsState = []; // { termMonths, percent }[] — state tạm trong lúc sửa form, ghi vào room.commissionPolicy khi Lưu
+
 function openRoomModal(roomId, presetPropertyId) {
   const room = roomId ? ROOMS.find(r => r.id === roomId) : null;
+  commissionRowsState = room && room.commissionPolicy ? room.commissionPolicy.map(r => ({ ...r })) : [];
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.id = 'roomModalOverlay';
@@ -366,43 +393,43 @@ function openRoomModal(roomId, presetPropertyId) {
     <div class="modal-box">
       <h2>${room ? 'Sửa phòng ' + room.code : 'Thêm phòng mới'}</h2>
       <div class="form-row">
-        <label>Thuộc nhà</label>
+        <label>${ICON_LBL_TYPE} Thuộc nhà</label>
         <select id="f_propertyId">
           ${PROPERTIES.map(p => `<option value="${p.id}" ${((room && room.propertyId === p.id) || presetPropertyId === p.id) ? 'selected' : ''}>${p.soNha}</option>`).join('')}
         </select>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
-          <label>Tầng</label>
+          <label>${ICON_LBL_FLOOR} Tầng</label>
           <input id="f_floor" value="${room ? room.floor : ''}" placeholder="Trệt / Lầu 1...">
         </div>
         <div class="form-row">
-          <label>Mã phòng *</label>
+          <label>${ICON_LBL_CODE} Mã phòng *</label>
           <input id="f_code" value="${room ? room.code : ''}" placeholder="T002">
           <div class="field-error" id="err_code">Bắt buộc nhập mã phòng</div>
         </div>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
-          <label>Loại phòng</label>
+          <label>${ICON_DOOR} Loại phòng</label>
           <select id="f_roomType">
             <option value="ben_trong" ${room && room.roomType === 'ben_trong' ? 'selected' : ''}>Bên trong</option>
             <option value="ban_cong" ${room && room.roomType === 'ban_cong' ? 'selected' : ''}>Ban công</option>
           </select>
         </div>
         <div class="form-row">
-          <label>Diện tích (m²)</label>
+          <label>${ICON_AREA} Diện tích (m²)</label>
           <input id="f_areaM2" type="number" value="${room ? room.areaM2 : ''}">
         </div>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
-          <label>Giá thuê/tháng *</label>
+          <label>${ICON_LBL_PRICE} Giá thuê/tháng *</label>
           <input id="f_priceMonthly" type="number" value="${room ? room.priceMonthly : ''}" placeholder="6200000">
           <div class="field-error" id="err_price">Bắt buộc nhập giá &gt; 0</div>
         </div>
         <div class="form-row">
-          <label>Trạng thái</label>
+          <label>${ICON_LBL_STATUS} Trạng thái</label>
           <select id="f_status">
             <option value="trong" ${room && room.status === 'trong' ? 'selected' : ''}>Còn trống</option>
             <option value="da_thue" ${room && room.status === 'da_thue' ? 'selected' : ''}>Đã thuê</option>
@@ -411,11 +438,44 @@ function openRoomModal(roomId, presetPropertyId) {
         </div>
       </div>
       <div class="form-row">
-        <label>Ảnh (mỗi dòng 1 link, có thể để trống)</label>
+        <label>${ICON_LBL_IMG} Ảnh (mỗi dòng 1 link, có thể để trống)</label>
         <textarea id="f_images">${room ? (room.images || []).join('\n') : ''}</textarea>
       </div>
+
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>${ICON_LBL_DEPOSIT} Cọc (số tháng)</label>
+          <input id="f_depositMonths" type="number" step="0.5" min="0" value="${room && room.depositPolicy ? room.depositPolicy.months : ''}" placeholder="1">
+        </div>
+      </div>
       <div class="form-row">
-        <label>Ghi chú</label>
+        <label>${ICON_LBL_NOTE} Ghi chú chính sách cọc</label>
+        <textarea id="f_depositNote" placeholder="Xem phòng chốt thì giữ 2tr, giữ 7 ngày...">${room && room.depositPolicy ? room.depositPolicy.note || '' : ''}</textarea>
+      </div>
+
+      <div class="form-row">
+        <label>${ICON_LBL_COMMISSION} Chính sách hoa hồng</label>
+        <div id="commissionRows"></div>
+        <button type="button" class="btn btn-sm" onclick="addCommissionRow()">+ Thêm mức hoa hồng</button>
+      </div>
+
+      <div class="form-row">
+        <label>${ICON_LBL_PROMO} Khuyến mãi (để trống nếu không có)</label>
+        <input id="f_promoText" value="${room && room.promotion ? room.promotion.text || '' : ''}" placeholder="Lì xì 500k khi cọc thành công">
+      </div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>Từ ngày</label>
+          <input type="date" id="f_promoFrom" value="${room && room.promotion ? room.promotion.validFrom || '' : ''}">
+        </div>
+        <div class="form-row">
+          <label>Đến ngày</label>
+          <input type="date" id="f_promoTo" value="${room && room.promotion ? room.promotion.validTo || '' : ''}">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>${ICON_LBL_NOTE} Ghi chú phòng</label>
         <textarea id="f_notes">${room ? room.notes || '' : ''}</textarea>
       </div>
       <div class="modal-actions">
@@ -426,7 +486,32 @@ function openRoomModal(roomId, presetPropertyId) {
     </div>
   `;
   document.body.appendChild(overlay);
+  renderCommissionRows();
 }
+
+// ── Chính sách hoa hồng: entity {termMonths, percent} thay cho text tự do ──
+function renderCommissionRows() {
+  const el = document.getElementById('commissionRows');
+  if (!el) return;
+  el.innerHTML = commissionRowsState.length ? commissionRowsState.map((row, i) => `
+    <div class="form-grid-2" style="align-items:end;margin-bottom:8px;">
+      <div class="form-row" style="margin-bottom:0;">
+        <label style="font-size:11px;">Hợp đồng (tháng)</label>
+        <input type="number" min="0" value="${row.termMonths}" onchange="updateCommissionRow(${i}, 'termMonths', this.value)">
+      </div>
+      <div class="form-row" style="margin-bottom:0;display:flex;gap:6px;">
+        <div style="flex:1;">
+          <label style="font-size:11px;">Hoa hồng (%)</label>
+          <input type="number" min="0" max="100" value="${row.percent}" onchange="updateCommissionRow(${i}, 'percent', this.value)">
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" style="margin-top:18px;" onclick="removeCommissionRow(${i})">Xoá</button>
+      </div>
+    </div>
+  `).join('') : '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:8px;">Chưa có mức hoa hồng nào.</div>';
+}
+function addCommissionRow() { commissionRowsState.push({ termMonths: 6, percent: 50 }); renderCommissionRows(); }
+function removeCommissionRow(i) { commissionRowsState.splice(i, 1); renderCommissionRows(); }
+function updateCommissionRow(i, field, value) { commissionRowsState[i][field] = Number(value) || 0; }
 
 function validateRoomForm() {
   let ok = true;
@@ -441,6 +526,9 @@ function validateRoomForm() {
 
 function saveRoom(roomId) {
   if (!validateRoomForm()) return;
+  const depositMonths = Number(document.getElementById('f_depositMonths').value) || 0;
+  const depositNote = document.getElementById('f_depositNote').value.trim();
+  const promoText = document.getElementById('f_promoText').value.trim();
   const payload = {
     propertyId: document.getElementById('f_propertyId').value,
     floor: document.getElementById('f_floor').value.trim(),
@@ -450,6 +538,9 @@ function saveRoom(roomId) {
     priceMonthly: Number(document.getElementById('f_priceMonthly').value),
     status: document.getElementById('f_status').value,
     images: document.getElementById('f_images').value.split('\n').map(s => s.trim()).filter(Boolean),
+    depositPolicy: (depositMonths || depositNote) ? { months: depositMonths, note: depositNote } : null,
+    commissionPolicy: commissionRowsState.filter(r => r.termMonths > 0 && r.percent > 0),
+    promotion: promoText ? { text: promoText, validFrom: document.getElementById('f_promoFrom').value, validTo: document.getElementById('f_promoTo').value } : null,
     notes: document.getElementById('f_notes').value.trim()
   };
   if (!VALID_ROOM_TYPE.includes(payload.roomType) || !VALID_STATUS.includes(payload.status)) {
@@ -485,54 +576,42 @@ function openPropertyModal(propertyId) {
     <div class="modal-box">
       <h2>${prop ? 'Sửa nhà: ' + prop.soNha : 'Thêm nhà mới'}</h2>
       <div class="form-row">
-        <label>Loại hình</label>
+        <label>${ICON_LBL_TYPE} Loại hình</label>
         <select id="pf_propertyType">
           <option value="phong_tro" ${!prop || prop.propertyType === 'phong_tro' ? 'selected' : ''}>Phòng trọ</option>
           <option value="can_ho" ${prop && prop.propertyType === 'can_ho' ? 'selected' : ''}>Căn hộ</option>
         </select>
       </div>
       <div class="form-row">
-        <label>Số nhà / Địa chỉ chi tiết *</label>
+        <label>${ICON_LBL_PIN} Số nhà / Địa chỉ chi tiết *</label>
         <input id="pf_soNha" value="${prop ? prop.soNha : ''}" placeholder="CHDV Lô C6, Khu dân cư Nam Long, Khu phố 2">
         <div class="field-error" id="err_soNha">Bắt buộc nhập số nhà/địa chỉ</div>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
-          <label>Phường/Xã</label>
+          <label>${ICON_LBL_PIN} Phường/Xã</label>
           <input id="pf_ward" list="wardList" value="${prop ? prop.ward : ''}">
         </div>
         <div class="form-row">
-          <label>Quận (địa chỉ cũ, thường để trống)</label>
+          <label>${ICON_LBL_PIN} Quận (địa chỉ cũ, thường để trống)</label>
           <input id="pf_quan" value="${prop ? prop.quan || '' : ''}" placeholder="Để trống nếu địa chỉ mới">
         </div>
       </div>
       <div class="form-row">
-        <label>Tỉnh/Thành phố</label>
+        <label>${ICON_LBL_PIN} Tỉnh/Thành phố</label>
         <input id="pf_city" value="${prop ? prop.city : 'Thành phố Hồ Chí Minh'}">
       </div>
       <div class="form-row">
-        <label>Số điện thoại liên hệ</label>
+        <label>${ICON_LBL_PHONE} Số điện thoại liên hệ</label>
         <input id="pf_phone" value="${prop ? prop.phone : ''}">
       </div>
       <div class="form-row">
-        <label>Tiện ích (mỗi dòng 1 ý)</label>
+        <label>${ICON_LBL_AMENITY} Tiện ích (mỗi dòng 1 ý)</label>
         <textarea id="pf_amenities">${prop ? (prop.amenities || []).join('\n') : ''}</textarea>
       </div>
       <div class="form-row">
-        <label>Xung quanh / di chuyển (mỗi dòng 1 ý)</label>
+        <label>${ICON_LBL_NEARBY} Xung quanh / di chuyển (mỗi dòng 1 ý)</label>
         <textarea id="pf_nearby">${prop ? (prop.nearby || []).join('\n') : ''}</textarea>
-      </div>
-      <div class="form-row">
-        <label>Chính sách cọc (mỗi dòng 1 ý)</label>
-        <textarea id="pf_deposit">${prop ? (prop.depositPolicy || []).join('\n') : ''}</textarea>
-      </div>
-      <div class="form-row">
-        <label>Chính sách hoa hồng (mỗi dòng 1 ý)</label>
-        <textarea id="pf_commission">${prop ? (prop.commissionPolicy || []).join('\n') : ''}</textarea>
-      </div>
-      <div class="form-row">
-        <label>Ghi chú</label>
-        <textarea id="pf_notes">${prop ? prop.notes || '' : ''}</textarea>
       </div>
       <div class="modal-actions">
         ${prop ? `<button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Xoá nhà</button>` : ''}
@@ -563,16 +642,13 @@ function saveProperty(propertyId) {
     city: document.getElementById('pf_city').value.trim(),
     phone: document.getElementById('pf_phone').value.trim(),
     amenities: split('pf_amenities'),
-    nearby: split('pf_nearby'),
-    depositPolicy: split('pf_deposit'),
-    commissionPolicy: split('pf_commission'),
-    notes: document.getElementById('pf_notes').value.trim()
+    nearby: split('pf_nearby')
   };
   if (propertyId) {
     const idx = PROPERTIES.findIndex(p => p.id === propertyId);
     PROPERTIES[idx] = { ...PROPERTIES[idx], ...payload, id: propertyId };
   } else {
-    PROPERTIES.push({ id: genId('P', PROPERTIES), ...payload, promotion: null, utilityFees: {} });
+    PROPERTIES.push({ id: genId('P', PROPERTIES), ...payload, utilityFees: {} });
   }
   persist();
   closeModal('propertyModalOverlay');

@@ -7,11 +7,6 @@
     "quan": "",
     "city": "Thành phố Hồ Chí Minh",
     "phone": "0768654627",
-    "promotion": {
-      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
-      "validFrom": "2026-07-11",
-      "validTo": "2026-07-30"
-    },
     "amenities": [
       "Đầy đủ nội thất: tủ lạnh, máy lạnh, máy giặt, giường, bếp, tủ quần áo, bàn ghế",
       "WC riêng",
@@ -28,16 +23,6 @@
       "Thuận tiện di chuyển ra Crescent Mall Nguyễn Lương Bằng",
       "Gần khu chế xuất Tân Thuận, cảng Cát Lái",
       "Khu dân cư an ninh, tiện ích đầy đủ"
-    ],
-    "depositPolicy": [
-      "Cọc: 1 tháng",
-      "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc",
-      "Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà"
-    ],
-    "commissionPolicy": [
-      "Hợp đồng 6 tháng: hoa hồng 50%",
-      "Hợp đồng 12 tháng: hoa hồng 80%"
-    ],
-    "notes": "Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale"
+    ]
   }
 ]

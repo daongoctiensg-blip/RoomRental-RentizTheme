@@ -3,7 +3,7 @@ const STORAGE_KEY_ROOMS = 'rr_rooms';
 const STORAGE_KEY_VERSION = 'rr_data_version';
 // Bump this bất cứ khi nào data/*.json schema hoặc data mẫu thay đổi đáng kể.
 // localStorage cũ (kể cả từ site/origin khác dùng chung domain github.io) sẽ tự bị bỏ qua và fetch lại.
-const DATA_VERSION = 'v2-room-images';
+const DATA_VERSION = 'v3-room-policies';
 
 function genId(prefix, list) {
   const nums = list

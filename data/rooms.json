@@ -16,7 +16,26 @@
       "images/rooms/l101-2.jpg",
       "images/rooms/l101-3.jpg"
     ],
-    "notes": ""
+    "notes": "",
+    "depositPolicy": {
+      "months": 1,
+      "note": "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc. Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà. Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale."
+    },
+    "commissionPolicy": [
+      {
+        "termMonths": 6,
+        "percent": 50
+      },
+      {
+        "termMonths": 12,
+        "percent": 80
+      }
+    ],
+    "promotion": {
+      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
+      "validFrom": "2026-07-11",
+      "validTo": "2026-07-30"
+    }
   },
   {
     "id": "R002",
@@ -35,7 +54,26 @@
       "images/rooms/l101-2.jpg",
       "images/rooms/l101-3.jpg"
     ],
-    "notes": ""
+    "notes": "",
+    "depositPolicy": {
+      "months": 1,
+      "note": "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc. Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà. Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale."
+    },
+    "commissionPolicy": [
+      {
+        "termMonths": 6,
+        "percent": 50
+      },
+      {
+        "termMonths": 12,
+        "percent": 80
+      }
+    ],
+    "promotion": {
+      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
+      "validFrom": "2026-07-11",
+      "validTo": "2026-07-30"
+    }
   },
   {
     "id": "R003",
@@ -54,7 +92,26 @@
       "images/rooms/l101-2.jpg",
       "images/rooms/l101-3.jpg"
     ],
-    "notes": ""
+    "notes": "",
+    "depositPolicy": {
+      "months": 1,
+      "note": "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc. Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà. Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale."
+    },
+    "commissionPolicy": [
+      {
+        "termMonths": 6,
+        "percent": 50
+      },
+      {
+        "termMonths": 12,
+        "percent": 80
+      }
+    ],
+    "promotion": {
+      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
+      "validFrom": "2026-07-11",
+      "validTo": "2026-07-30"
+    }
   },
   {
     "id": "R004",
@@ -73,7 +130,26 @@
       "images/rooms/l101-2.jpg",
       "images/rooms/l101-3.jpg"
     ],
-    "notes": "Có 2 phòng ngủ với 2 bộ nội thất riêng"
+    "notes": "Có 2 phòng ngủ với 2 bộ nội thất riêng",
+    "depositPolicy": {
+      "months": 1,
+      "note": "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc. Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà. Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale."
+    },
+    "commissionPolicy": [
+      {
+        "termMonths": 6,
+        "percent": 50
+      },
+      {
+        "termMonths": 12,
+        "percent": 80
+      }
+    ],
+    "promotion": {
+      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
+      "validFrom": "2026-07-11",
+      "validTo": "2026-07-30"
+    }
   },
   {
     "id": "R005",
@@ -92,6 +168,25 @@
       "images/rooms/l101-2.jpg",
       "images/rooms/l101-3.jpg"
     ],
-    "notes": ""
+    "notes": "",
+    "depositPolicy": {
+      "months": 1,
+      "note": "Xem phòng chốt thì giữ 2tr, giữ 7 ngày nếu không quay lại mất cọc. Khách vào ký Hợp đồng và đóng 1 tháng tiền thuê nhà. Khách huỷ cọc sẽ trừ tiền số ngày giữ chỗ, còn lại chia 50/50 chủ nhà và sale."
+    },
+    "commissionPolicy": [
+      {
+        "termMonths": 6,
+        "percent": 50
+      },
+      {
+        "termMonths": 12,
+        "percent": 80
+      }
+    ],
+    "promotion": {
+      "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
+      "validFrom": "2026-07-11",
+      "validTo": "2026-07-30"
+    }
   }
 ]
