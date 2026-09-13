@@ -43,6 +43,7 @@ const PRICE_BUCKETS = [
 ];
 
 function onTypeCheckboxChange() {
+  detailView = null;
   const phongTro = document.getElementById('ftypePhongTro').checked;
   const canHo = document.getElementById('ftypeCanHo').checked;
   if (phongTro && !canHo) filters.propertyType = 'phong_tro';
@@ -52,6 +53,7 @@ function onTypeCheckboxChange() {
 }
 
 function onPriceRangeInput(changedId) {
+  detailView = null;
   const minEl = document.getElementById('priceRangeMin');
   const maxEl = document.getElementById('priceRangeMax');
   let minV = Number(minEl.value), maxV = Number(maxEl.value);
@@ -92,12 +94,14 @@ function syncFilterSidebarUI() {
   updatePriceSliderUI();
 }
 function setFilterWard(v) {
+  detailView = null;
   const opts = DISTRICTS[filters.district] || [];
   const found = opts.find(o => o.label === v);
   filters.ward = found ? found.match : v.trim();
   render();
 }
 function onDistrictChange(v) {
+  detailView = null;
   filters.district = v;
   filters.ward = '';
   document.getElementById('filterWardInput').value = '';
@@ -178,8 +182,9 @@ function renderDashboard() {
     </div>`;
 }
 
-function setFilterStatus(v) { filters.status = v; render(); }
+function setFilterStatus(v) { detailView = null; filters.status = v; render(); }
 function setPriceBucket(key) {
+  detailView = null;
   const b = PRICE_BUCKETS.find(x => x.key === key);
   if (!b) return;
   filters.priceFrom = b.from;
@@ -188,7 +193,48 @@ function setPriceBucket(key) {
 }
 
 // ── Render ────────────────────────────────────────────────
+let detailView = null; // { propertyId, highlightRoomId } | null — xem "1 nhà + tất cả phòng của nó"
+
+function roomCardHtml(r, prop, opts) {
+  opts = opts || {};
+  const images = (r.images && r.images.length) ? r.images : [];
+  const hasImg = images.length > 0;
+  const imagesAttr = hasImg ? JSON.stringify(images).replace(/'/g, '&#39;') : '[]';
+  return `
+    <div class="room-card${opts.highlight ? ' highlight' : ''}" id="room-${r.id}">
+      <div class="room-card-img${hasImg ? '' : ' placeholder'}" data-idx="0" data-images='${imagesAttr}'${hasImg ? ` onclick="event.stopPropagation(); openLightboxFromCard(this)"` : ''}>
+        <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
+        ${hasImg ? `<img src="${images[0]}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
+        ${images.length > 1 ? `
+          <button class="cs-arrow cs-prev" onclick="event.stopPropagation(); slideRoomImg(this, -1)">‹</button>
+          <button class="cs-arrow cs-next" onclick="event.stopPropagation(); slideRoomImg(this, 1)">›</button>
+          <div class="cs-dots">${images.map((_, i) => `<span class="cs-dot${i === 0 ? ' active' : ''}" onclick="event.stopPropagation(); setRoomImg(this, ${i})"></span>`).join('')}</div>
+        ` : ''}
+      </div>
+      <div class="room-card-body">
+        <div onclick="openPropertyDetail('${prop.id}', '${r.id}')">
+          <div class="room-addr">${prop.soNha}</div>
+          <div class="floor">${r.floor}</div>
+          <div class="code">${r.code}</div>
+          <div class="meta">
+            <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
+            <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
+          </div>
+        </div>
+        <div class="room-card-foot">
+          <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm" onclick="openRoomModal('${r.id}')">Sửa</button>
+            <button class="btn btn-sm" onclick="exportRoom('${r.id}')">Xuất PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function render() {
+  if (detailView) { renderPropertyDetailView(); return; }
   renderDashboard();
   syncFilterSidebarUI();
   const el = document.getElementById('main-content');
@@ -219,41 +265,48 @@ function render() {
 
   el.innerHTML = `
     <div class="room-grid">
-      ${matchedRooms.map(({ room: r, prop }) => {
-        const images = (r.images && r.images.length) ? r.images : [];
-        const hasImg = images.length > 0;
-        const imagesAttr = hasImg ? JSON.stringify(images).replace(/'/g, '&#39;') : '[]';
-        return `
-        <div class="room-card">
-          <div class="room-card-img${hasImg ? '' : ' placeholder'}" data-idx="0" data-images='${imagesAttr}'${hasImg ? ` onclick="event.stopPropagation(); openLightboxFromCard(this)"` : ''}>
-            <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
-            ${hasImg ? `<img src="${images[0]}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
-            ${images.length > 1 ? `
-              <button class="cs-arrow cs-prev" onclick="event.stopPropagation(); slideRoomImg(this, -1)">‹</button>
-              <button class="cs-arrow cs-next" onclick="event.stopPropagation(); slideRoomImg(this, 1)">›</button>
-              <div class="cs-dots">${images.map((_, i) => `<span class="cs-dot${i === 0 ? ' active' : ''}" onclick="event.stopPropagation(); setRoomImg(this, ${i})"></span>`).join('')}</div>
-            ` : ''}
-          </div>
-          <div class="room-card-body">
-            <div onclick="openRoomModal('${r.id}')">
-              <div class="room-addr">${prop.soNha}</div>
-              <div class="floor">${r.floor}</div>
-              <div class="code">${r.code}</div>
-              <div class="meta">
-                <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
-                <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
-              </div>
-            </div>
-            <div class="room-card-foot">
-              <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
-              <button class="btn btn-sm" onclick="exportRoom('${r.id}')">Xuất PDF</button>
-            </div>
-          </div>
-        </div>
-      `;
-      }).join('')}
+      ${matchedRooms.map(({ room: r, prop }) => roomCardHtml(r, prop)).join('')}
     </div>
   `;
+}
+
+// ── Xem 1 nhà + tất cả phòng của nó (giống Trip.com: bấm "Xem phòng
+// trống" ở kết quả tìm kiếm -> mở trang khách sạn, cuộn tới đúng phòng) ──
+function openPropertyDetail(propertyId, roomId) {
+  detailView = { propertyId, highlightRoomId: roomId };
+  render();
+}
+function closePropertyDetail() {
+  detailView = null;
+  render();
+}
+function renderPropertyDetailView() {
+  const el = document.getElementById('main-content');
+  const prop = PROPERTIES.find(p => p.id === detailView.propertyId);
+  if (!prop) { detailView = null; render(); return; }
+  // Hiện TẤT CẢ phòng của nhà này, không áp bộ lọc tìm kiếm đang chọn — đúng như Trip.com hiện cả khách sạn
+  const rooms = ROOMS.filter(r => r.propertyId === prop.id);
+  document.getElementById('roomCount').textContent = rooms.length;
+  el.innerHTML = `
+    <div class="detail-back"><button class="btn btn-sm" onclick="closePropertyDetail()">← Quay lại danh sách</button></div>
+    <div class="detail-head">
+      <div>
+        <h2>${prop.soNha}</h2>
+        <div class="addr">${fullAddress(prop)}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa nhà</button>
+        <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
+      </div>
+    </div>
+    <div class="room-grid">
+      ${rooms.map(r => roomCardHtml(r, prop, { highlight: r.id === detailView.highlightRoomId })).join('')}
+    </div>
+  `;
+  if (detailView.highlightRoomId) {
+    const target = document.getElementById('room-' + detailView.highlightRoomId);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 // ── Card image slideshow (vanilla, no library) ───────────
@@ -301,7 +354,7 @@ function renderManageBar() {
 }
 function setManageId(v) { manageId = v; renderManageBar(); }
 // ── Filters ───────────────────────────────────────────────
-function setSearch(v) { filters.q = v; render(); }
+function setSearch(v) { detailView = null; filters.q = v; render(); }
 
 // ── Room modal (add/edit) ────────────────────────────────
 function openRoomModal(roomId, presetPropertyId) {

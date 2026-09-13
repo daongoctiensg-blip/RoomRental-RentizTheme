@@ -300,6 +300,24 @@ main { padding: 0; max-width: none; margin: 0; }
   padding: 60px 20px;
 }
 
+.detail-back { margin-bottom: 14px; }
+.detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-head .addr { color: var(--ink-soft); font-size: 13px; margin-top: 4px; }
+
+.room-card.highlight {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 /* Modal */
 .modal-overlay {
   position: fixed; inset: 0;
