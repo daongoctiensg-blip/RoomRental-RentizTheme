@@ -184,29 +184,63 @@ function render() {
   el.innerHTML = `
     <div class="room-grid">
       ${matchedRooms.map(({ room: r, prop }) => {
-        const img = (r.images && r.images[0]) || '';
+        const images = (r.images && r.images.length) ? r.images : [];
+        const hasImg = images.length > 0;
+        const imagesAttr = hasImg ? JSON.stringify(images).replace(/'/g, '&#39;') : '[]';
         return `
         <div class="room-card">
-          <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
-          <div class="room-card-img${img ? '' : ' placeholder'}"${img ? ` onclick="event.stopPropagation(); openLightbox('${img}')"` : ''}>
-            ${img ? `<img src="${img}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
+          <div class="room-card-img${hasImg ? '' : ' placeholder'}" data-idx="0" data-images='${imagesAttr}'${hasImg ? ` onclick="event.stopPropagation(); openLightboxFromCard(this)"` : ''}>
+            <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
+            ${hasImg ? `<img src="${images[0]}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
+            ${images.length > 1 ? `
+              <button class="cs-arrow cs-prev" onclick="event.stopPropagation(); slideRoomImg(this, -1)">‹</button>
+              <button class="cs-arrow cs-next" onclick="event.stopPropagation(); slideRoomImg(this, 1)">›</button>
+              <div class="cs-dots">${images.map((_, i) => `<span class="cs-dot${i === 0 ? ' active' : ''}" onclick="event.stopPropagation(); setRoomImg(this, ${i})"></span>`).join('')}</div>
+            ` : ''}
           </div>
-          <div onclick="openRoomModal('${r.id}')">
-            <div class="room-addr">${prop.soNha}</div>
-            <div class="floor">${r.floor}</div>
-            <div class="code">${r.code}</div>
-            <div class="meta">
-              <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
-              <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
+          <div class="room-card-body">
+            <div onclick="openRoomModal('${r.id}')">
+              <div class="room-addr">${prop.soNha}</div>
+              <div class="floor">${r.floor}</div>
+              <div class="code">${r.code}</div>
+              <div class="meta">
+                <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
+                <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
+              </div>
             </div>
-            <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+            <div class="room-card-foot">
+              <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
+              <button class="btn btn-sm" onclick="exportRoom('${r.id}')">Xuất PDF</button>
+            </div>
           </div>
-          <button class="btn btn-sm" style="margin-top:8px;" onclick="exportRoom('${r.id}')">Xuất PDF phòng này</button>
         </div>
       `;
       }).join('')}
     </div>
   `;
+}
+
+// ── Card image slideshow (vanilla, no library) ───────────
+function slideRoomImg(btn, dir) {
+  const wrap = btn.closest('.room-card-img');
+  const images = JSON.parse(wrap.dataset.images);
+  if (!images.length) return;
+  let idx = (parseInt(wrap.dataset.idx, 10) + dir + images.length) % images.length;
+  wrap.dataset.idx = idx;
+  wrap.querySelector('img').src = images[idx];
+  wrap.querySelectorAll('.cs-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+function setRoomImg(dot, idx) {
+  const wrap = dot.closest('.room-card-img');
+  const images = JSON.parse(wrap.dataset.images);
+  wrap.dataset.idx = idx;
+  wrap.querySelector('img').src = images[idx];
+  wrap.querySelectorAll('.cs-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+function openLightboxFromCard(el) {
+  const images = JSON.parse(el.dataset.images || '[]');
+  const idx = parseInt(el.dataset.idx || '0', 10);
+  if (images.length) openLightbox(images[idx]);
 }
 
 function renderPropertyActionsBar() {

@@ -92,16 +92,20 @@ main { padding: 0 28px 40px; max-width: 1100px; margin: 0 auto; }
 
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 760px) {
+  .room-grid { grid-template-columns: 1fr; }
 }
 
 .room-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 14px;
-  cursor: pointer;
+  padding: 12px;
+  display: flex;
+  gap: 14px;
   position: relative;
 }
 .room-card:hover { border-color: var(--accent); }
@@ -113,14 +117,25 @@ main { padding: 0 28px 40px; max-width: 1100px; margin: 0 auto; }
 .room-card .meta-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; }
 .room-card .price { font-family: 'Source Serif 4', serif; font-size: 17px; color: var(--brass); font-weight: 600; }
 
+.room-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.room-card-body > div:first-child { cursor: pointer; }
+.room-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+
 .room-card-img {
-  width: 100%;
+  width: 190px;
+  flex-shrink: 0;
   aspect-ratio: 4 / 3;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 10px;
   background: var(--accent-soft);
   cursor: zoom-in;
+  position: relative;
 }
 .room-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .room-card-img.placeholder {
@@ -131,6 +146,55 @@ main { padding: 0 28px 40px; max-width: 1100px; margin: 0 auto; }
   cursor: default;
 }
 .room-card-img.placeholder svg { width: 30%; height: 30%; opacity: .45; }
+
+@media (max-width: 480px) {
+  .room-card { flex-direction: column; }
+  .room-card-img { width: 100%; }
+}
+
+/* Slideshow (nhiều ảnh/phòng, vanilla — không thêm thư viện) */
+.cs-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,.85);
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 3;
+  color: var(--ink);
+}
+.room-card-img:hover .cs-arrow { opacity: 1; }
+.cs-prev { left: 6px; }
+.cs-next { right: 6px; }
+.cs-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  z-index: 3;
+}
+.cs-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.65);
+  cursor: pointer;
+  transition: width .15s, height .15s;
+}
+.cs-dot.active { background: #fff; width: 8px; height: 8px; }
 
 .lightbox-overlay {
   position: fixed;
@@ -151,8 +215,8 @@ main { padding: 0 28px 40px; max-width: 1100px; margin: 0 auto; }
   padding: 3px 9px;
   border-radius: 999px;
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   z-index: 2;
 }
 .status-trong { background: var(--status-trong-bg); color: var(--status-trong); }
