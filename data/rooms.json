@@ -8,7 +8,14 @@
     "areaM2": 26,
     "priceMonthly": 6200000,
     "status": "trong",
-    "images": [],
+    "images": [
+      "images/rooms/l101-4.jpg",
+      "images/rooms/l101-6.jpg",
+      "images/rooms/l101-5.jpg",
+      "images/rooms/l101-1.jpg",
+      "images/rooms/l101-2.jpg",
+      "images/rooms/l101-3.jpg"
+    ],
     "notes": ""
   },
   {
@@ -39,7 +46,14 @@
     "areaM2": 20,
     "priceMonthly": 4900000,
     "status": "trong",
-    "images": [],
+    "images": [
+      "images/rooms/l101-4.jpg",
+      "images/rooms/l101-6.jpg",
+      "images/rooms/l101-5.jpg",
+      "images/rooms/l101-1.jpg",
+      "images/rooms/l101-2.jpg",
+      "images/rooms/l101-3.jpg"
+    ],
     "notes": ""
   },
   {
@@ -51,7 +65,14 @@
     "areaM2": 34,
     "priceMonthly": 8000000,
     "status": "trong",
-    "images": [],
+    "images": [
+      "images/rooms/l101-4.jpg",
+      "images/rooms/l101-6.jpg",
+      "images/rooms/l101-5.jpg",
+      "images/rooms/l101-1.jpg",
+      "images/rooms/l101-2.jpg",
+      "images/rooms/l101-3.jpg"
+    ],
     "notes": "Có 2 phòng ngủ với 2 bộ nội thất riêng"
   },
   {
@@ -63,7 +84,14 @@
     "areaM2": 20,
     "priceMonthly": 5200000,
     "status": "trong",
-    "images": [],
+    "images": [
+      "images/rooms/l101-4.jpg",
+      "images/rooms/l101-6.jpg",
+      "images/rooms/l101-5.jpg",
+      "images/rooms/l101-1.jpg",
+      "images/rooms/l101-2.jpg",
+      "images/rooms/l101-3.jpg"
+    ],
     "notes": ""
   }
 ]
