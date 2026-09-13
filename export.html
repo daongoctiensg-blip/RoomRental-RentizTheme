@@ -13,9 +13,18 @@
   h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1px solid #ddd8c8; padding-bottom: 4px; }
   ul { margin: 0; padding-left: 20px; }
   li { margin-bottom: 4px; }
-  .room-line { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #ddd8c8; font-size: 14px; }
+  .room-line { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px dashed #ddd8c8; font-size: 14px; }
+  .room-line .thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+  .room-line-info { flex: 1; }
   .room-line .code { font-weight: 600; }
-  .price { color: #8a6a35; font-weight: 600; }
+  .price { color: #8a6a35; font-weight: 600; white-space: nowrap; }
+  .hero-img { width: 100%; max-height: 260px; object-fit: cover; border-radius: 8px; margin-bottom: 16px; display: block; }
+  .room-gallery { display: flex; gap: 8px; overflow-x: auto; margin: 12px 0 18px; }
+  .room-gallery img { width: 220px; height: 150px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+  @media print {
+    .room-gallery { flex-wrap: wrap; overflow: visible; }
+    .room-gallery img { width: 150px; height: 105px; }
+  }
   .contact { margin-top: 20px; font-size: 15px; font-weight: 600; }
   .toolbar-print { text-align: center; margin-bottom: 20px; }
   .toolbar-print button { padding: 8px 16px; border-radius: 6px; border: 1px solid #3c5b42; background: #3c5b42; color: #fff; cursor: pointer; font-size: 14px; }
@@ -88,17 +97,24 @@ async function render() {
     const prop = properties.find(p => p.id === id);
     if (!prop) { document.getElementById('content').innerHTML = 'Không tìm thấy khu này.'; return; }
     const propRooms = rooms.filter(r => r.propertyId === prop.id);
+    const visibleRooms = propRooms.filter(r => r.status !== 'da_thue');
+    const heroImg = visibleRooms.map(r => r.images && r.images[0]).find(Boolean);
     document.getElementById('content').innerHTML = `
       <h1>${prop.soNha}</h1>
       <div class="addr">${fullAddress(prop)}</div>
+      ${heroImg ? `<img class="hero-img" src="${heroImg}" alt="">` : ''}
       ${isPromoActive(prop.promotion) ? `<div class="promo">${prop.promotion.text} — áp dụng đến ${prop.promotion.validTo}</div>` : ''}
       <h2>Thông tin chung</h2>
-      ${propRooms.filter(r => r.status !== 'da_thue').map(r => `
+      ${visibleRooms.map(r => {
+        const thumb = r.images && r.images[0];
+        return `
         <div class="room-line">
-          <span><span class="code">${r.floor} – ${r.code}</span> · ${ROOM_TYPE_LABEL[r.roomType] || r.roomType}: ${r.areaM2}m²</span>
+          ${thumb ? `<img class="thumb" src="${thumb}" alt="">` : ''}
+          <div class="room-line-info"><span class="code">${r.floor} – ${r.code}</span> · ${ROOM_TYPE_LABEL[r.roomType] || r.roomType}: ${r.areaM2}m²</div>
           <span class="price">${fmtPrice(r.priceMonthly)}/tháng</span>
         </div>
-      `).join('')}
+      `;
+      }).join('')}
       ${renderPolicyBlocks(prop)}
       <div class="contact">
         <a href="tel:${prop.phone}" style="margin-right:12px;">📞 Gọi ${prop.phone}</a>
@@ -112,8 +128,9 @@ async function render() {
     document.getElementById('content').innerHTML = `
       <h1>${prop.soNha} — ${room.floor} ${room.code}</h1>
       <div class="addr">${fullAddress(prop)}</div>
+      ${room.images && room.images.length ? `<div class="room-gallery">${room.images.map(u => `<img src="${u}" alt="">`).join('')}</div>` : ''}
       <div class="room-line">
-        <span>${ROOM_TYPE_LABEL[room.roomType] || room.roomType} · ${room.areaM2}m²</span>
+        <div class="room-line-info">${ROOM_TYPE_LABEL[room.roomType] || room.roomType} · ${room.areaM2}m²</div>
         <span class="price">${fmtPrice(room.priceMonthly)}/tháng</span>
       </div>
       ${room.notes ? `<p>${room.notes}</p>` : ''}

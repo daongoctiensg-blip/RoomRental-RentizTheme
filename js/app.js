@@ -10,6 +10,21 @@ const ROOM_TYPE_LABEL = {
 const VALID_STATUS = Object.keys(STATUS_LABEL);
 const VALID_ROOM_TYPE = Object.keys(ROOM_TYPE_LABEL);
 
+// ── Small inline icons (no external asset/font dependency) ──
+const ICON_AREA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 3v4M16 3v4M3 8h4M3 16h4"/></svg>';
+const ICON_DOOR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="1"/><circle cx="14.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
+const ICON_HOUSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>';
+
+// ── Lightbox (xem ảnh to, vanilla — không thêm thư viện) ────
+function openLightbox(url) {
+  if (!url) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.onclick = () => overlay.remove();
+  overlay.innerHTML = `<img src="${url}" alt="" onclick="event.stopPropagation()">`;
+  document.body.appendChild(overlay);
+}
+
 let PROPERTIES = [];
 let ROOMS = [];
 let WARDS = [];
@@ -176,18 +191,27 @@ function render() {
           </div>
         </div>
         <div class="room-grid">
-          ${rooms.map(r => `
+          ${rooms.map(r => {
+            const img = (r.images && r.images[0]) || '';
+            return `
             <div class="room-card">
               <span class="status-pill status-${r.status}">${STATUS_LABEL[r.status]}</span>
+              <div class="room-card-img${img ? '' : ' placeholder'}"${img ? ` onclick="event.stopPropagation(); openLightbox('${img}')"` : ''}>
+                ${img ? `<img src="${img}" alt="${r.code}" loading="lazy">` : ICON_HOUSE}
+              </div>
               <div onclick="openRoomModal('${r.id}')">
                 <div class="floor">${r.floor}</div>
                 <div class="code">${r.code}</div>
-                <div class="meta">${ROOM_TYPE_LABEL[r.roomType] || r.roomType} · ${r.areaM2}m²</div>
+                <div class="meta">
+                  <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
+                  <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
+                </div>
                 <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
               </div>
               <button class="btn btn-sm" style="margin-top:8px;" onclick="exportRoom('${r.id}')">Xuất PDF phòng này</button>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
       </div>
     `;

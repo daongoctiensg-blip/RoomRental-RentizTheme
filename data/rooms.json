@@ -20,7 +20,14 @@
     "areaM2": 32,
     "priceMonthly": 7500000,
     "status": "trong",
-    "images": [],
+    "images": [
+      "images/rooms/l101-4.jpg",
+      "images/rooms/l101-6.jpg",
+      "images/rooms/l101-5.jpg",
+      "images/rooms/l101-1.jpg",
+      "images/rooms/l101-2.jpg",
+      "images/rooms/l101-3.jpg"
+    ],
     "notes": ""
   },
   {
