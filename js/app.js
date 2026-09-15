@@ -281,6 +281,8 @@ function render() {
   });
 
   document.getElementById('roomCount').textContent = matchedRooms.length;
+  const mrc = document.getElementById('mobileResultCount');
+  if (mrc) mrc.textContent = matchedRooms.length;
 
   if (!matchedRooms.length) {
     el.innerHTML = '<div class="empty-state">Không tìm thấy phòng phù hợp bộ lọc.</div>';
@@ -304,6 +306,17 @@ function closePropertyDetail() {
   detailView = null;
   render();
 }
+function amenitiesNearbyHtml(prop) {
+  let html = '';
+  if (prop.amenities && prop.amenities.length) {
+    html += `<div class="detail-highlights"><div class="detail-highlights-title">${ICON_LBL_AMENITY} Điểm nổi bật</div><ul>${prop.amenities.map(a => `<li>${a}</li>`).join('')}</ul></div>`;
+  }
+  if (prop.nearby && prop.nearby.length) {
+    html += `<div class="detail-highlights"><div class="detail-highlights-title">${ICON_LBL_NEARBY} Xung quanh</div><ul>${prop.nearby.map(a => `<li>${a}</li>`).join('')}</ul></div>`;
+  }
+  return html;
+}
+
 function renderPropertyDetailView() {
   const el = document.getElementById('main-content');
   const prop = PROPERTIES.find(p => p.id === detailView.propertyId);
@@ -311,8 +324,10 @@ function renderPropertyDetailView() {
   // Hiện TẤT CẢ phòng của nhà này, không áp bộ lọc tìm kiếm đang chọn — đúng như Trip.com hiện cả khách sạn
   const rooms = ROOMS.filter(r => r.propertyId === prop.id);
   document.getElementById('roomCount').textContent = rooms.length;
+  const heroImg = rooms.map(r => r.images && r.images[0]).find(Boolean);
   el.innerHTML = `
     <div class="detail-back"><button class="btn btn-sm" onclick="closePropertyDetail()">← Quay lại danh sách</button></div>
+    ${heroImg ? `<img class="detail-hero" src="${heroImg}" alt="">` : ''}
     <div class="detail-head">
       <div>
         <h2>${prop.soNha}</h2>
@@ -323,6 +338,7 @@ function renderPropertyDetailView() {
         <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
       </div>
     </div>
+    ${amenitiesNearbyHtml(prop)}
     <div class="room-grid">
       ${rooms.map(r => roomCardHtml(r, prop, { highlight: r.id === detailView.highlightRoomId })).join('')}
     </div>
@@ -377,6 +393,14 @@ function renderManageBar() {
   `;
 }
 function setManageId(v) { manageId = v; renderManageBar(); }
+
+// ── Bộ lọc dạng overlay toàn màn hình trên mobile (giống Trip.com) ──
+function openMobileFilters() {
+  document.getElementById('sidebar').classList.add('open');
+}
+function closeMobileFilters() {
+  document.getElementById('sidebar').classList.remove('open');
+}
 // ── Filters ───────────────────────────────────────────────
 function setSearch(v) { detailView = null; filters.q = v; render(); }
 

@@ -26,6 +26,7 @@
   <select id="filterDistrict" onchange="onDistrictChange(this.value)"></select>
   <input type="text" id="filterWardInput" list="wardList" placeholder="Phường/Xã..." style="width:200px;" oninput="setFilterWard(this.value)">
   <datalist id="wardList"></datalist>
+  <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
   <div class="spacer"></div>
   <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
 </div>
@@ -33,7 +34,11 @@
 <div id="propertyActionsBar" class="property-actions-bar"></div>
 
 <div class="layout">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-mobile-header">
+      <h3 style="margin:0;">Lọc theo</h3>
+      <button class="btn btn-sm" onclick="closeMobileFilters()">✕ Đóng</button>
+    </div>
     <div class="filter-block">
       <div class="filter-title">Loại hình</div>
       <label class="checkbox-row"><input type="checkbox" id="ftypePhongTro" onchange="onTypeCheckboxChange()"> Phòng trọ</label>
@@ -49,6 +54,7 @@
         <input type="range" id="priceRangeMax" min="0" max="15000000" step="100000" oninput="onPriceRangeInput('priceRangeMax')">
       </div>
     </div>
+    <button class="btn btn-primary sidebar-mobile-apply" onclick="closeMobileFilters()">Xem kết quả (<span id="mobileResultCount">0</span>)</button>
   </aside>
 
   <div class="content-col">
