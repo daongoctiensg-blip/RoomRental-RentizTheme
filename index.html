@@ -26,6 +26,12 @@
   <select id="filterDistrict" onchange="onDistrictChange(this.value)"></select>
   <input type="text" id="filterWardInput" list="wardList" placeholder="Phường/Xã..." style="width:200px;" oninput="setFilterWard(this.value)">
   <datalist id="wardList"></datalist>
+  <select id="sortBySelect" onchange="setSortBy(this.value)">
+    <option value="default">Sắp xếp: mặc định</option>
+    <option value="price_asc">Giá thấp → cao</option>
+    <option value="price_desc">Giá cao → thấp</option>
+    <option value="newest">Mới thêm trước</option>
+  </select>
   <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
   <div class="spacer"></div>
   <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>

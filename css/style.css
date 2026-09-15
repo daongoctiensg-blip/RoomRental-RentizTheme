@@ -219,6 +219,16 @@ main { padding: 0; max-width: none; margin: 0; }
 }
 .room-card:hover { border-color: var(--accent); }
 .room-card .room-addr { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+.promo-tag {
+  display: inline-block;
+  font-size: 12px;
+  color: #6b5216;
+  background: #f4ecd7;
+  border: 1px solid #e3d5a8;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
 .room-card .floor { font-size: 12px; color: var(--ink-soft); }
 .room-card .code { font-size: 17px; font-weight: 600; margin: 2px 0 6px; }
 .room-card .meta { display: flex; gap: 12px; align-items: center; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; flex-wrap: wrap; }
@@ -305,6 +315,13 @@ main { padding: 0; max-width: none; margin: 0; }
 }
 .cs-dot.active { background: #fff; width: 8px; height: 8px; }
 
+/* Trên thiết bị chạm không có hover -> luôn hiện mũi tên, dots to hơn để bấm dễ */
+@media (hover: none), (pointer: coarse) {
+  .cs-arrow { opacity: 1; width: 28px; height: 28px; font-size: 17px; }
+  .cs-dot { width: 8px; height: 8px; }
+  .cs-dot.active { width: 10px; height: 10px; }
+}
+
 .lightbox-overlay {
   position: fixed;
   inset: 0;
@@ -317,6 +334,26 @@ main { padding: 0; max-width: none; margin: 0; }
   cursor: zoom-out;
 }
 .lightbox-overlay img { max-width: 100%; max-height: 100%; border-radius: 8px; cursor: default; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translate(-50%, 12px);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast-error { background: var(--status-thue); }
 
 .status-pill {
   display: inline-block;
@@ -394,7 +431,17 @@ main { padding: 0; max-width: none; margin: 0; }
 }
 .form-row textarea { min-height: 60px; resize: vertical; }
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 18px -24px -24px;
+  padding: 14px 24px;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
 .field-error { color: var(--status-thue); font-size: 12px; margin-top: 4px; display: none; }
 
 @media (max-width: 600px) {

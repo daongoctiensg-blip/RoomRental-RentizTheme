@@ -47,6 +47,7 @@ let WARDS = [];
 let DISTRICTS = {};
 let filters = { status: 'trong', propertyType: 'phong_tro', priceFrom: 0, priceTo: 1000000000, district: 'Quận 7', ward: '', q: '' };
 let manageId = ''; // nhà đang chọn để Sửa/Xuất PDF — tách riêng khỏi bộ lọc tìm kiếm
+let sortBy = 'default';
 
 const PRICE_SLIDER_MAX = 15000000; // ngân sách slider chỉ hiện thực tế tới mức này, vượt mức = "không giới hạn"
 
@@ -240,6 +241,7 @@ function roomCardHtml(r, prop, opts) {
           <div class="room-addr">${prop.soNha}</div>
           <div class="floor">${r.floor}</div>
           <div class="code">${r.code}</div>
+          ${isPromoActive(r.promotion) ? `<div class="promo-tag">🎉 ${r.promotion.text}</div>` : ''}
           <div class="meta">
             <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
             <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
@@ -247,8 +249,9 @@ function roomCardHtml(r, prop, opts) {
         </div>
         <div class="room-card-foot">
           <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
-          <div style="display:flex;gap:6px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <button class="btn btn-sm" onclick="openRoomModal('${r.id}')">Sửa</button>
+            <button class="btn btn-sm" onclick="duplicateRoom('${r.id}')">Nhân bản</button>
             <button class="btn btn-sm" onclick="exportRoom('${r.id}')">Xuất PDF</button>
           </div>
         </div>
@@ -273,8 +276,11 @@ function render() {
     matchedRooms.push({ room: r, prop });
   });
 
-  // Sắp theo nhà (địa chỉ) rồi tầng/mã, để các phòng cùng nhà vẫn đứng gần nhau dù không có tiêu đề gộp
+  // Sắp theo lựa chọn của người dùng; mặc định vẫn theo nhà (địa chỉ) rồi tầng/mã
   matchedRooms.sort((a, b) => {
+    if (sortBy === 'price_asc') return a.room.priceMonthly - b.room.priceMonthly;
+    if (sortBy === 'price_desc') return b.room.priceMonthly - a.room.priceMonthly;
+    if (sortBy === 'newest') return (b.room.createdAt || 0) - (a.room.createdAt || 0);
     const byAddr = a.prop.soNha.localeCompare(b.prop.soNha);
     if (byAddr !== 0) return byAddr;
     return String(a.room.floor).localeCompare(String(b.room.floor)) || a.room.code.localeCompare(b.room.code);
@@ -372,6 +378,36 @@ function openLightboxFromCard(el) {
   if (images.length) openLightbox(images[idx]);
 }
 
+// ── Toast + confirm tự chế (thay cho alert()/confirm() của trình duyệt) ──
+function showToast(message, type) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'error' ? ' toast-error' : '');
+  el.textContent = message;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 250);
+  }, 2600);
+}
+
+function showConfirm(message, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box" style="max-width:360px;">
+      <p style="margin:0 0 20px;">${message}</p>
+      <div class="modal-actions" style="position:static;margin:0;padding:0;border-top:none;background:none;">
+        <button class="btn" id="confirmNoBtn">Huỷ</button>
+        <button class="btn btn-danger" id="confirmYesBtn">Đồng ý</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('confirmNoBtn').onclick = () => overlay.remove();
+  document.getElementById('confirmYesBtn').onclick = () => { overlay.remove(); onConfirm(); };
+}
+
 function renderManageBar() {
   const bar = document.getElementById('propertyActionsBar');
   if (!bar) return;
@@ -403,19 +439,21 @@ function closeMobileFilters() {
 }
 // ── Filters ───────────────────────────────────────────────
 function setSearch(v) { detailView = null; filters.q = v; render(); }
+function setSortBy(v) { detailView = null; sortBy = v; render(); }
 
 // ── Room modal (add/edit) ────────────────────────────────
 let commissionRowsState = []; // { termMonths, percent }[] — state tạm trong lúc sửa form, ghi vào room.commissionPolicy khi Lưu
 
-function openRoomModal(roomId, presetPropertyId) {
+function openRoomModal(roomId, presetPropertyId, cloneFrom) {
   const room = roomId ? ROOMS.find(r => r.id === roomId) : null;
-  commissionRowsState = room && room.commissionPolicy ? room.commissionPolicy.map(r => ({ ...r })) : [];
+  const src = room || cloneFrom || null;
+  commissionRowsState = src && src.commissionPolicy ? src.commissionPolicy.map(r => ({ ...r })) : [];
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.id = 'roomModalOverlay';
   overlay.innerHTML = `
     <div class="modal-box">
-      <h2>${room ? 'Sửa phòng ' + room.code : 'Thêm phòng mới'}</h2>
+      <h2>${room ? 'Sửa phòng ' + room.code : (cloneFrom ? 'Nhân bản từ phòng ' + cloneFrom.code : 'Thêm phòng mới')}</h2>
       <div class="form-row">
         <label>${ICON_LBL_TYPE} Thuộc nhà</label>
         <select id="f_propertyId">
@@ -425,7 +463,7 @@ function openRoomModal(roomId, presetPropertyId) {
       <div class="form-grid-2">
         <div class="form-row">
           <label>${ICON_LBL_FLOOR} Tầng</label>
-          <input id="f_floor" value="${room ? room.floor : ''}" placeholder="Trệt / Lầu 1...">
+          <input id="f_floor" value="${src ? src.floor : ''}" placeholder="Trệt / Lầu 1...">
         </div>
         <div class="form-row">
           <label>${ICON_LBL_CODE} Mã phòng *</label>
@@ -437,19 +475,19 @@ function openRoomModal(roomId, presetPropertyId) {
         <div class="form-row">
           <label>${ICON_DOOR} Loại phòng</label>
           <select id="f_roomType">
-            <option value="ben_trong" ${room && room.roomType === 'ben_trong' ? 'selected' : ''}>Bên trong</option>
-            <option value="ban_cong" ${room && room.roomType === 'ban_cong' ? 'selected' : ''}>Ban công</option>
+            <option value="ben_trong" ${src && src.roomType === 'ben_trong' ? 'selected' : ''}>Bên trong</option>
+            <option value="ban_cong" ${src && src.roomType === 'ban_cong' ? 'selected' : ''}>Ban công</option>
           </select>
         </div>
         <div class="form-row">
           <label>${ICON_AREA} Diện tích (m²)</label>
-          <input id="f_areaM2" type="number" value="${room ? room.areaM2 : ''}">
+          <input id="f_areaM2" type="number" value="${src ? src.areaM2 : ''}">
         </div>
       </div>
       <div class="form-grid-2">
         <div class="form-row">
           <label>${ICON_LBL_PRICE} Giá thuê/tháng *</label>
-          <input id="f_priceMonthly" type="number" value="${room ? room.priceMonthly : ''}" placeholder="6200000">
+          <input id="f_priceMonthly" type="number" value="${src ? src.priceMonthly : ''}" placeholder="6200000">
           <div class="field-error" id="err_price">Bắt buộc nhập giá &gt; 0</div>
         </div>
         <div class="form-row">
@@ -463,18 +501,18 @@ function openRoomModal(roomId, presetPropertyId) {
       </div>
       <div class="form-row">
         <label>${ICON_LBL_IMG} Ảnh (mỗi dòng 1 link, có thể để trống)</label>
-        <textarea id="f_images">${room ? (room.images || []).join('\n') : ''}</textarea>
+        <textarea id="f_images">${src ? (src.images || []).join('\n') : ''}</textarea>
       </div>
 
       <div class="form-grid-2">
         <div class="form-row">
           <label>${ICON_LBL_DEPOSIT} Cọc (số tháng)</label>
-          <input id="f_depositMonths" type="number" step="0.5" min="0" value="${room && room.depositPolicy ? room.depositPolicy.months : ''}" placeholder="1">
+          <input id="f_depositMonths" type="number" step="0.5" min="0" value="${src && src.depositPolicy ? src.depositPolicy.months : ''}" placeholder="1">
         </div>
       </div>
       <div class="form-row">
         <label>${ICON_LBL_NOTE} Ghi chú chính sách cọc</label>
-        <textarea id="f_depositNote" placeholder="Xem phòng chốt thì giữ 2tr, giữ 7 ngày...">${room && room.depositPolicy ? room.depositPolicy.note || '' : ''}</textarea>
+        <textarea id="f_depositNote" placeholder="Xem phòng chốt thì giữ 2tr, giữ 7 ngày...">${src && src.depositPolicy ? src.depositPolicy.note || '' : ''}</textarea>
       </div>
 
       <div class="form-row">
@@ -485,22 +523,22 @@ function openRoomModal(roomId, presetPropertyId) {
 
       <div class="form-row">
         <label>${ICON_LBL_PROMO} Khuyến mãi (để trống nếu không có)</label>
-        <input id="f_promoText" value="${room && room.promotion ? room.promotion.text || '' : ''}" placeholder="Lì xì 500k khi cọc thành công">
+        <input id="f_promoText" value="${src && src.promotion ? src.promotion.text || '' : ''}" placeholder="Lì xì 500k khi cọc thành công">
       </div>
       <div class="form-grid-2">
         <div class="form-row">
           <label>Từ ngày</label>
-          <input type="date" id="f_promoFrom" value="${room && room.promotion ? room.promotion.validFrom || '' : ''}">
+          <input type="date" id="f_promoFrom" value="${src && src.promotion ? src.promotion.validFrom || '' : ''}">
         </div>
         <div class="form-row">
           <label>Đến ngày</label>
-          <input type="date" id="f_promoTo" value="${room && room.promotion ? room.promotion.validTo || '' : ''}">
+          <input type="date" id="f_promoTo" value="${src && src.promotion ? src.promotion.validTo || '' : ''}">
         </div>
       </div>
 
       <div class="form-row">
         <label>${ICON_LBL_NOTE} Ghi chú phòng</label>
-        <textarea id="f_notes">${room ? room.notes || '' : ''}</textarea>
+        <textarea id="f_notes">${src ? src.notes || '' : ''}</textarea>
       </div>
       <div class="modal-actions">
         ${room ? `<button class="btn btn-danger" onclick="deleteRoom('${room.id}')">Xoá phòng</button>` : ''}
@@ -568,26 +606,36 @@ function saveRoom(roomId) {
     notes: document.getElementById('f_notes').value.trim()
   };
   if (!VALID_ROOM_TYPE.includes(payload.roomType) || !VALID_STATUS.includes(payload.status)) {
-    alert('Loại phòng hoặc trạng thái không hợp lệ');
+    showToast('Loại phòng hoặc trạng thái không hợp lệ', 'error');
     return;
   }
   if (roomId) {
     const idx = ROOMS.findIndex(r => r.id === roomId);
     ROOMS[idx] = { ...ROOMS[idx], ...payload, id: roomId };
   } else {
+    payload.createdAt = Date.now();
     ROOMS.push({ id: genId('R', ROOMS), ...payload });
   }
   persist();
   closeModal('roomModalOverlay');
   render();
+  showToast(roomId ? `Đã lưu phòng ${payload.code}` : `Đã thêm phòng ${payload.code}`);
 }
 
 function deleteRoom(roomId) {
-  if (!confirm('Xoá phòng này? Không thể hoàn tác.')) return;
-  ROOMS = ROOMS.filter(r => r.id !== roomId);
-  persist();
-  closeModal('roomModalOverlay');
-  render();
+  showConfirm('Xoá phòng này? Không thể hoàn tác.', () => {
+    ROOMS = ROOMS.filter(r => r.id !== roomId);
+    persist();
+    closeModal('roomModalOverlay');
+    render();
+    showToast('Đã xoá phòng');
+  });
+}
+
+function duplicateRoom(roomId) {
+  const src = ROOMS.find(r => r.id === roomId);
+  if (!src) return;
+  openRoomModal(null, src.propertyId, src);
 }
 
 // ── Property modal (add/edit) ────────────────────────────
@@ -677,20 +725,23 @@ function saveProperty(propertyId) {
   persist();
   closeModal('propertyModalOverlay');
   render();
+  showToast(propertyId ? 'Đã lưu thông tin nhà' : 'Đã thêm nhà mới');
 }
 
 function deleteProperty(propertyId) {
   const hasRooms = ROOMS.some(r => r.propertyId === propertyId);
   if (hasRooms) {
-    alert('Property này còn phòng bên trong — xoá hết phòng trước khi xoá property');
+    showToast('Nhà này còn phòng bên trong — xoá hết phòng trước khi xoá nhà', 'error');
     return;
   }
-  if (!confirm('Xoá nhà này? Không thể hoàn tác. (phải xoá hết phòng bên trong trước)')) return;
-  PROPERTIES = PROPERTIES.filter(p => p.id !== propertyId);
-  persist();
-  closeModal('propertyModalOverlay');
-  if (manageId === propertyId) manageId = '';
-  render();
+  showConfirm('Xoá nhà này? Không thể hoàn tác.', () => {
+    PROPERTIES = PROPERTIES.filter(p => p.id !== propertyId);
+    persist();
+    closeModal('propertyModalOverlay');
+    if (manageId === propertyId) manageId = '';
+    render();
+    showToast('Đã xoá nhà');
+  });
 }
 
 function closeModal(id) {
@@ -706,11 +757,13 @@ function exportRoom(roomId) {
 }
 
 async function resetSampleData() {
-  if (!confirm('Xoá hết data hiện tại, nạp lại data mẫu ban đầu?')) return;
-  const data = await storeResetToSample();
-  PROPERTIES = data.properties;
-  ROOMS = data.rooms;
-  render();
+  showConfirm('Xoá hết data hiện tại, nạp lại data mẫu ban đầu?', async () => {
+    const data = await storeResetToSample();
+    PROPERTIES = data.properties;
+    ROOMS = data.rooms;
+    render();
+    showToast('Đã nạp lại data mẫu');
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────
