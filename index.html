@@ -9,15 +9,14 @@
 <script src="js/keygate.js"></script>
 
 
+<div id="search-view">
 <div class="app-header">
   <div>
     <h1>Quản lý phòng trọ / căn hộ</h1>
     <div class="sub">Công cụ nội bộ — không dùng để khách xem trực tiếp</div>
   </div>
   <div style="display:flex;gap:8px;">
-    <button class="btn" onclick="resetSampleData()">Nạp lại data mẫu</button>
-    <button class="btn" onclick="openRoomModal(null, null)">+ Thêm phòng</button>
-    <button class="btn" onclick="openPropertyModal(null)">+ Thêm nhà</button>
+    <button class="btn btn-primary" onclick="openAdmin()">🔧 Quản lý</button>
   </div>
 </div>
 
@@ -36,8 +35,6 @@
   <div class="spacer"></div>
   <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
 </div>
-
-<div id="propertyActionsBar" class="property-actions-bar"></div>
 
 <div class="layout">
   <aside class="sidebar" id="sidebar">
@@ -67,6 +64,21 @@
     <div id="miniDashboard"></div>
     <main id="main-content"></main>
   </div>
+</div>
+</div>
+
+<div id="admin-view" style="display:none;">
+  <div class="app-header">
+    <div>
+      <h1 id="adminTitle">Quản lý</h1>
+      <div class="sub">Khu vực quản trị — thêm/sửa/xoá nhà và phòng</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="resetSampleData()">Nạp lại data mẫu</button>
+      <button class="btn" onclick="closeAdmin()">← Về trang tìm phòng</button>
+    </div>
+  </div>
+  <main id="admin-content" style="padding:0 28px 40px;max-width:1100px;margin:0 auto;"></main>
 </div>
 
 <script src="js/store.js"></script>

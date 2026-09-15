@@ -67,23 +67,23 @@ function renderPolicyBlocks(prop) {
   if (prop.amenities && prop.amenities.length) {
     html += `<h2>Tiện ích</h2><ul>${prop.amenities.map(a => `<li>${a}</li>`).join('')}</ul>`;
   }
-  if (prop.utilityFees && Object.keys(prop.utilityFees).length) {
-    const f = prop.utilityFees;
-    html += `<h2>Phí dịch vụ</h2><ul>
-      ${f.electricity ? `<li>Điện: ${f.electricity}</li>` : ''}
-      ${f.water ? `<li>Nước: ${f.water}</li>` : ''}
-      ${f.service ? `<li>Phí dịch vụ: ${f.service}</li>` : ''}
-    </ul>`;
-  }
   if (prop.nearby && prop.nearby.length) {
     html += `<h2>Di chuyển</h2><ul>${prop.nearby.map(a => `<li>${a}</li>`).join('')}</ul>`;
   }
   return html;
 }
 
-// Cọc/hoa hồng giờ thuộc về từng phòng (mỗi phòng có thể khác nhau), không còn ở nhà
+// Cọc/hoa hồng/phí điện nước giờ thuộc về từng phòng (mỗi phòng có thể khác nhau), không còn ở nhà
 function renderRoomPolicyBlocks(room) {
   let html = '';
+  if (room.utilityFees && (room.utilityFees.electricity || room.utilityFees.water || room.utilityFees.service)) {
+    const f = room.utilityFees;
+    html += `<h2>Phí dịch vụ</h2><ul>
+      ${f.electricity ? `<li>Điện: ${f.electricity}</li>` : ''}
+      ${f.water ? `<li>Nước: ${f.water}</li>` : ''}
+      ${f.service ? `<li>Phí dịch vụ: ${f.service}</li>` : ''}
+    </ul>`;
+  }
   if (room.depositPolicy && (room.depositPolicy.months || room.depositPolicy.note)) {
     html += `<h2>Chính sách cọc</h2><ul>`;
     if (room.depositPolicy.months) html += `<li>Cọc: ${room.depositPolicy.months} tháng</li>`;

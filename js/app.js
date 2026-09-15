@@ -30,6 +30,8 @@ const ICON_LBL_CODE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 const ICON_LBL_PRICE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1 1-1.8 2.5-1.8s2.5.8 2.5 1.7c0 2.3-5 1.7-5 4.2 0 1 1 1.8 2.5 1.8s2.5-.8 2.5-1.7"/></svg>';
 const ICON_LBL_STATUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21V4l13 3-13 3"/></svg>';
 const ICON_LBL_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-5 4 4 3-3 4 4"/></svg>';
+const ICON_LBL_ELECTRIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>';
+const ICON_LBL_WATER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>';
 
 // ── Lightbox (xem ảnh to, vanilla — không thêm thư viện) ────
 function openLightbox(url) {
@@ -46,7 +48,6 @@ let ROOMS = [];
 let WARDS = [];
 let DISTRICTS = {};
 let filters = { status: 'trong', propertyType: 'phong_tro', priceFrom: 0, priceTo: 1000000000, district: 'Quận 7', ward: '', q: '' };
-let manageId = ''; // nhà đang chọn để Sửa/Xuất PDF — tách riêng khỏi bộ lọc tìm kiếm
 let sortBy = 'default';
 
 const PRICE_SLIDER_MAX = 15000000; // ngân sách slider chỉ hiện thực tế tới mức này, vượt mức = "không giới hạn"
@@ -222,6 +223,7 @@ let detailView = null; // { propertyId, highlightRoomId } | null — xem "1 nhà
 
 function roomCardHtml(r, prop, opts) {
   opts = opts || {};
+  const mode = opts.mode || 'browse'; // 'browse' (khách xem, chỉ Xuất PDF) | 'admin' (Sửa/Nhân bản/Xoá/Xuất PDF)
   const images = (r.images && r.images.length) ? r.images : [];
   const hasImg = images.length > 0;
   const imagesAttr = hasImg ? JSON.stringify(images).replace(/'/g, '&#39;') : '[]';
@@ -237,7 +239,7 @@ function roomCardHtml(r, prop, opts) {
         ` : ''}
       </div>
       <div class="room-card-body">
-        <div onclick="openPropertyDetail('${prop.id}', '${r.id}')">
+        <div onclick="${mode === 'admin' ? `goAdminRoomForm('${r.id}')` : `openPropertyDetail('${prop.id}', '${r.id}')`}">
           <div class="room-addr">${prop.soNha}</div>
           <div class="floor">${r.floor}</div>
           <div class="code">${r.code}</div>
@@ -250,8 +252,11 @@ function roomCardHtml(r, prop, opts) {
         <div class="room-card-foot">
           <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn btn-sm" onclick="openRoomModal('${r.id}')">Sửa</button>
-            <button class="btn btn-sm" onclick="duplicateRoom('${r.id}')">Nhân bản</button>
+            ${mode === 'admin' ? `
+              <button class="btn btn-sm" onclick="goAdminRoomForm('${r.id}')">Sửa</button>
+              <button class="btn btn-sm" onclick="duplicateRoom('${r.id}')">Nhân bản</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRoom('${r.id}')">Xoá</button>
+            ` : ''}
             <button class="btn btn-sm" onclick="exportRoom('${r.id}')">Xuất PDF</button>
           </div>
         </div>
@@ -265,7 +270,6 @@ function render() {
   renderDashboard();
   syncFilterSidebarUI();
   const el = document.getElementById('main-content');
-  renderManageBar();
 
   // Danh sách phẳng: không gộp theo nhà, chỉ trả về các phòng khớp tiêu chí
   const matchedRooms = [];
@@ -340,7 +344,6 @@ function renderPropertyDetailView() {
         <div class="addr">${fullAddress(prop)}</div>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa nhà</button>
         <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
       </div>
     </div>
@@ -408,28 +411,6 @@ function showConfirm(message, onConfirm) {
   document.getElementById('confirmYesBtn').onclick = () => { overlay.remove(); onConfirm(); };
 }
 
-function renderManageBar() {
-  const bar = document.getElementById('propertyActionsBar');
-  if (!bar) return;
-  if (!PROPERTIES.length) { bar.innerHTML = ''; return; }
-  if (!manageId || !PROPERTIES.find(p => p.id === manageId)) manageId = PROPERTIES[0].id;
-  const prop = PROPERTIES.find(p => p.id === manageId);
-  bar.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <span style="color:var(--ink-soft);font-size:13px;">Quản lý nhà:</span>
-      <select onchange="setManageId(this.value)" style="border:1px solid var(--border);border-radius:var(--radius);padding:6px 8px;font-size:13px;font-family:inherit;">
-        ${PROPERTIES.map(p => `<option value="${p.id}" ${p.id === manageId ? 'selected' : ''}>${p.soNha}</option>`).join('')}
-      </select>
-      <span class="addr">${fullAddress(prop)}</span>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-sm" onclick="openPropertyModal('${prop.id}')">Sửa nhà</button>
-      <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
-    </div>
-  `;
-}
-function setManageId(v) { manageId = v; renderManageBar(); }
-
 // ── Bộ lọc dạng overlay toàn màn hình trên mobile (giống Trip.com) ──
 function openMobileFilters() {
   document.getElementById('sidebar').classList.add('open');
@@ -441,19 +422,102 @@ function closeMobileFilters() {
 function setSearch(v) { detailView = null; filters.q = v; render(); }
 function setSortBy(v) { detailView = null; sortBy = v; render(); }
 
+// ── Khu Quản lý (Admin) — tách riêng khỏi trang tìm phòng, có "trang"
+// riêng cho từng việc (danh sách nhà / sửa nhà / danh sách phòng của 1
+// nhà / sửa phòng), thay cho modal nhỏ trước đây ───────────────────
+let adminPage = 'properties'; // 'properties' | 'property-form' | 'room-list' | 'room-form'
+let adminCtx = {};
+
+function openAdmin() {
+  document.getElementById('search-view').style.display = 'none';
+  document.getElementById('admin-view').style.display = 'block';
+  goAdminProperties();
+}
+function closeAdmin() {
+  document.getElementById('admin-view').style.display = 'none';
+  document.getElementById('search-view').style.display = 'block';
+  render();
+}
+function goAdminProperties() { adminPage = 'properties'; adminCtx = {}; renderAdmin(); }
+function goAdminPropertyForm(propertyId) { adminPage = 'property-form'; adminCtx = { propertyId }; renderAdmin(); }
+function goAdminRoomList(propertyId) { adminPage = 'room-list'; adminCtx = { propertyId }; renderAdmin(); }
+function goAdminRoomForm(roomId, presetPropertyId, cloneFrom) { adminPage = 'room-form'; adminCtx = { roomId, presetPropertyId, cloneFrom }; renderAdmin(); }
+
+function renderAdmin() {
+  const el = document.getElementById('admin-content');
+  const title = document.getElementById('adminTitle');
+  if (adminPage === 'properties') {
+    title.textContent = 'Danh sách nhà';
+    el.innerHTML = renderAdminPropertiesHtml();
+  } else if (adminPage === 'property-form') {
+    const prop = adminCtx.propertyId ? PROPERTIES.find(p => p.id === adminCtx.propertyId) : null;
+    title.textContent = prop ? 'Sửa nhà' : 'Thêm nhà mới';
+    el.innerHTML = renderAdminPropertyFormHtml(prop);
+  } else if (adminPage === 'room-list') {
+    const prop = PROPERTIES.find(p => p.id === adminCtx.propertyId);
+    if (!prop) { goAdminProperties(); return; }
+    title.textContent = 'Phòng của ' + prop.soNha;
+    el.innerHTML = renderAdminRoomListHtml(prop);
+  } else if (adminPage === 'room-form') {
+    const room = adminCtx.roomId ? ROOMS.find(r => r.id === adminCtx.roomId) : null;
+    title.textContent = room ? 'Sửa phòng ' + room.code : (adminCtx.cloneFrom ? 'Nhân bản từ phòng ' + adminCtx.cloneFrom.code : 'Thêm phòng mới');
+    el.innerHTML = renderAdminRoomFormHtml(room, adminCtx.presetPropertyId, adminCtx.cloneFrom);
+    renderCommissionRows();
+  }
+}
+
+function renderAdminPropertiesHtml() {
+  return `
+    <div style="margin-bottom:16px;"><button class="btn btn-primary" onclick="goAdminPropertyForm(null)">+ Thêm nhà</button></div>
+    <div class="admin-list">
+      ${PROPERTIES.map(p => {
+        const count = ROOMS.filter(r => r.propertyId === p.id).length;
+        return `
+        <div class="admin-row">
+          <div>
+            <div class="admin-row-title">${p.soNha}</div>
+            <div class="admin-row-sub">${fullAddress(p)} · ${count} phòng</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="goAdminRoomList('${p.id}')">Quản lý phòng</button>
+            <button class="btn btn-sm" onclick="goAdminPropertyForm('${p.id}')">Sửa nhà</button>
+          </div>
+        </div>
+      `;
+      }).join('') || '<div class="empty-state">Chưa có nhà nào.</div>'}
+    </div>
+  `;
+}
+
+function renderAdminRoomListHtml(prop) {
+  const rooms = ROOMS.filter(r => r.propertyId === prop.id);
+  return `
+    <div class="detail-back"><button class="btn btn-sm" onclick="goAdminProperties()">← Danh sách nhà</button></div>
+    <div class="detail-head">
+      <div>
+        <h2>${prop.soNha}</h2>
+        <div class="addr">${fullAddress(prop)}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="goAdminPropertyForm('${prop.id}')">Sửa nhà</button>
+        <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
+        <button class="btn btn-primary btn-sm" onclick="goAdminRoomForm(null, '${prop.id}')">+ Thêm phòng</button>
+      </div>
+    </div>
+    ${rooms.length ? `<div class="room-grid">${rooms.map(r => roomCardHtml(r, prop, { mode: 'admin' })).join('')}</div>` : '<div class="empty-state">Nhà này chưa có phòng nào.</div>'}
+  `;
+}
+
 // ── Room modal (add/edit) ────────────────────────────────
 let commissionRowsState = []; // { termMonths, percent }[] — state tạm trong lúc sửa form, ghi vào room.commissionPolicy khi Lưu
 
-function openRoomModal(roomId, presetPropertyId, cloneFrom) {
-  const room = roomId ? ROOMS.find(r => r.id === roomId) : null;
+function renderAdminRoomFormHtml(room, presetPropertyId, cloneFrom) {
   const src = room || cloneFrom || null;
   commissionRowsState = src && src.commissionPolicy ? src.commissionPolicy.map(r => ({ ...r })) : [];
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'roomModalOverlay';
-  overlay.innerHTML = `
-    <div class="modal-box">
-      <h2>${room ? 'Sửa phòng ' + room.code : (cloneFrom ? 'Nhân bản từ phòng ' + cloneFrom.code : 'Thêm phòng mới')}</h2>
+  const uf = (src && src.utilityFees) || {};
+  return `
+    <div class="detail-back"><button class="btn btn-sm" onclick="goAdminRoomList('${room ? room.propertyId : (presetPropertyId || (PROPERTIES[0] && PROPERTIES[0].id))}')">← Danh sách phòng</button></div>
+    <div class="form-page">
       <div class="form-row">
         <label>${ICON_LBL_TYPE} Thuộc nhà</label>
         <select id="f_propertyId">
@@ -536,19 +600,32 @@ function openRoomModal(roomId, presetPropertyId, cloneFrom) {
         </div>
       </div>
 
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>${ICON_LBL_ELECTRIC} Điện</label>
+          <input id="f_feeElectricity" value="${uf.electricity || ''}" placeholder="4.000đ/kWh">
+        </div>
+        <div class="form-row">
+          <label>${ICON_LBL_WATER} Nước</label>
+          <input id="f_feeWater" value="${uf.water || ''}" placeholder="20.000đ/m³">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>${ICON_LBL_NOTE} Phí dịch vụ (giữ xe, vệ sinh...)</label>
+        <input id="f_feeService" value="${uf.service || ''}" placeholder="100.000đ/tháng — có thể ghi chú giảm giá riêng ở đây">
+      </div>
+
       <div class="form-row">
         <label>${ICON_LBL_NOTE} Ghi chú phòng</label>
         <textarea id="f_notes">${src ? src.notes || '' : ''}</textarea>
       </div>
       <div class="modal-actions">
         ${room ? `<button class="btn btn-danger" onclick="deleteRoom('${room.id}')">Xoá phòng</button>` : ''}
-        <button class="btn" onclick="closeModal('roomModalOverlay')">Đóng</button>
+        <button class="btn" onclick="goAdminRoomList('${room ? room.propertyId : (presetPropertyId || (PROPERTIES[0] && PROPERTIES[0].id))}')">Huỷ</button>
         <button class="btn btn-primary" onclick="saveRoom(${room ? `'${room.id}'` : 'null'})">Lưu</button>
       </div>
     </div>
   `;
-  document.body.appendChild(overlay);
-  renderCommissionRows();
 }
 
 // ── Chính sách hoa hồng: entity {termMonths, percent} thay cho text tự do ──
@@ -591,6 +668,9 @@ function saveRoom(roomId) {
   const depositMonths = Number(document.getElementById('f_depositMonths').value) || 0;
   const depositNote = document.getElementById('f_depositNote').value.trim();
   const promoText = document.getElementById('f_promoText').value.trim();
+  const feeElectricity = document.getElementById('f_feeElectricity').value.trim();
+  const feeWater = document.getElementById('f_feeWater').value.trim();
+  const feeService = document.getElementById('f_feeService').value.trim();
   const payload = {
     propertyId: document.getElementById('f_propertyId').value,
     floor: document.getElementById('f_floor').value.trim(),
@@ -603,6 +683,7 @@ function saveRoom(roomId) {
     depositPolicy: (depositMonths || depositNote) ? { months: depositMonths, note: depositNote } : null,
     commissionPolicy: commissionRowsState.filter(r => r.termMonths > 0 && r.percent > 0),
     promotion: promoText ? { text: promoText, validFrom: document.getElementById('f_promoFrom').value, validTo: document.getElementById('f_promoTo').value } : null,
+    utilityFees: (feeElectricity || feeWater || feeService) ? { electricity: feeElectricity, water: feeWater, service: feeService } : null,
     notes: document.getElementById('f_notes').value.trim()
   };
   if (!VALID_ROOM_TYPE.includes(payload.roomType) || !VALID_STATUS.includes(payload.status)) {
@@ -617,36 +698,32 @@ function saveRoom(roomId) {
     ROOMS.push({ id: genId('R', ROOMS), ...payload });
   }
   persist();
-  closeModal('roomModalOverlay');
-  render();
   showToast(roomId ? `Đã lưu phòng ${payload.code}` : `Đã thêm phòng ${payload.code}`);
+  goAdminRoomList(payload.propertyId);
 }
 
 function deleteRoom(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  const propertyId = room ? room.propertyId : null;
   showConfirm('Xoá phòng này? Không thể hoàn tác.', () => {
     ROOMS = ROOMS.filter(r => r.id !== roomId);
     persist();
-    closeModal('roomModalOverlay');
-    render();
     showToast('Đã xoá phòng');
+    goAdminRoomList(propertyId);
   });
 }
 
 function duplicateRoom(roomId) {
   const src = ROOMS.find(r => r.id === roomId);
   if (!src) return;
-  openRoomModal(null, src.propertyId, src);
+  goAdminRoomForm(null, src.propertyId, src);
 }
 
-// ── Property modal (add/edit) ────────────────────────────
-function openPropertyModal(propertyId) {
-  const prop = propertyId ? PROPERTIES.find(p => p.id === propertyId) : null;
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.id = 'propertyModalOverlay';
-  overlay.innerHTML = `
-    <div class="modal-box">
-      <h2>${prop ? 'Sửa nhà: ' + prop.soNha : 'Thêm nhà mới'}</h2>
+// ── Trang Thêm/Sửa nhà (Admin) ───────────────────────────
+function renderAdminPropertyFormHtml(prop) {
+  return `
+    <div class="detail-back"><button class="btn btn-sm" onclick="goAdminProperties()">← Danh sách nhà</button></div>
+    <div class="form-page">
       <div class="form-row">
         <label>${ICON_LBL_TYPE} Loại hình</label>
         <select id="pf_propertyType">
@@ -687,12 +764,11 @@ function openPropertyModal(propertyId) {
       </div>
       <div class="modal-actions">
         ${prop ? `<button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Xoá nhà</button>` : ''}
-        <button class="btn" onclick="closeModal('propertyModalOverlay')">Đóng</button>
+        <button class="btn" onclick="goAdminProperties()">Huỷ</button>
         <button class="btn btn-primary" onclick="saveProperty(${prop ? `'${prop.id}'` : 'null'})">Lưu</button>
       </div>
     </div>
   `;
-  document.body.appendChild(overlay);
 }
 
 function validatePropertyForm() {
@@ -720,12 +796,11 @@ function saveProperty(propertyId) {
     const idx = PROPERTIES.findIndex(p => p.id === propertyId);
     PROPERTIES[idx] = { ...PROPERTIES[idx], ...payload, id: propertyId };
   } else {
-    PROPERTIES.push({ id: genId('P', PROPERTIES), ...payload, utilityFees: {} });
+    PROPERTIES.push({ id: genId('P', PROPERTIES), ...payload });
   }
   persist();
-  closeModal('propertyModalOverlay');
-  render();
   showToast(propertyId ? 'Đã lưu thông tin nhà' : 'Đã thêm nhà mới');
+  goAdminProperties();
 }
 
 function deleteProperty(propertyId) {
@@ -737,10 +812,8 @@ function deleteProperty(propertyId) {
   showConfirm('Xoá nhà này? Không thể hoàn tác.', () => {
     PROPERTIES = PROPERTIES.filter(p => p.id !== propertyId);
     persist();
-    closeModal('propertyModalOverlay');
-    if (manageId === propertyId) manageId = '';
-    render();
     showToast('Đã xoá nhà');
+    goAdminProperties();
   });
 }
 

@@ -400,6 +400,29 @@ main { padding: 0; max-width: none; margin: 0; }
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+/* Khu Quản lý (Admin) */
+.form-page {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 640px;
+}
+.admin-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-row-title { font-weight: 600; font-size: 15px; }
+.admin-row-sub { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
 /* Modal */
 .modal-overlay {
   position: fixed; inset: 0;
