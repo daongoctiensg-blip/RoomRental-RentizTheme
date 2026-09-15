@@ -277,8 +277,19 @@ function roomCardHtml(r, prop, opts) {
   `;
 }
 
+function setSearchChromeVisible(visible) {
+  const toolbar = document.querySelector('.toolbar');
+  const sidebarEl = document.getElementById('sidebar');
+  const dashEl = document.getElementById('miniDashboard');
+  const display = visible ? '' : 'none';
+  if (toolbar) toolbar.style.display = display;
+  if (sidebarEl && !sidebarEl.classList.contains('open')) sidebarEl.style.display = display;
+  if (dashEl) dashEl.style.display = display;
+}
+
 function render() {
-  if (detailView) { renderPropertyDetailView(); return; }
+  if (detailView) { setSearchChromeVisible(false); renderPropertyDetailView(); return; }
+  setSearchChromeVisible(true);
   renderDashboard();
   syncFilterSidebarUI();
   const el = document.getElementById('main-content');
