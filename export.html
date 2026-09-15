@@ -62,6 +62,18 @@ function isPromoActive(promo) {
   return true;
 }
 
+// Phí điện/nước/dịch vụ: nhà có mức mặc định, phòng nào không tự đặt thì dùng theo nhà,
+// phòng nào có đặt riêng thì ưu tiên giá trị của phòng cho đúng field đó.
+function effectiveUtilityFees(prop, room) {
+  const p = (prop && prop.utilityFees) || {};
+  const r = (room && room.utilityFees) || {};
+  return {
+    electricity: r.electricity || p.electricity || '',
+    water: r.water || p.water || '',
+    service: r.service || p.service || ''
+  };
+}
+
 function renderPolicyBlocks(prop) {
   let html = '';
   if (prop.amenities && prop.amenities.length) {
@@ -73,11 +85,11 @@ function renderPolicyBlocks(prop) {
   return html;
 }
 
-// Cọc/hoa hồng/phí điện nước giờ thuộc về từng phòng (mỗi phòng có thể khác nhau), không còn ở nhà
-function renderRoomPolicyBlocks(room) {
+// Cọc/hoa hồng giờ thuộc về từng phòng (mỗi phòng có thể khác nhau), không còn ở nhà
+function renderRoomPolicyBlocks(prop, room) {
   let html = '';
-  if (room.utilityFees && (room.utilityFees.electricity || room.utilityFees.water || room.utilityFees.service)) {
-    const f = room.utilityFees;
+  const f = effectiveUtilityFees(prop, room);
+  if (f.electricity || f.water || f.service) {
     html += `<h2>Phí dịch vụ</h2><ul>
       ${f.electricity ? `<li>Điện: ${f.electricity}</li>` : ''}
       ${f.water ? `<li>Nước: ${f.water}</li>` : ''}
@@ -145,7 +157,7 @@ async function render() {
       </div>
       ${room.notes ? `<p>${room.notes}</p>` : ''}
       ${renderPolicyBlocks(prop)}
-      ${renderRoomPolicyBlocks(room)}
+      ${renderRoomPolicyBlocks(prop, room)}
       <div class="contact">
         <a href="tel:${prop.phone}" style="margin-right:12px;">📞 Gọi ${prop.phone}</a>
         <a href="https://zalo.me/${prop.phone.replace(/\\D/g,'')}" target="_blank">💬 Chat Zalo</a>

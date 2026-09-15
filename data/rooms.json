@@ -35,11 +35,6 @@
       "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
       "validFrom": "2026-07-11",
       "validTo": "2026-07-30"
-    },
-    "utilityFees": {
-      "electricity": "4000đ/kWh",
-      "water": "100.000đ/người",
-      "service": "200.000đ/tháng"
     }
   },
   {
@@ -78,11 +73,6 @@
       "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
       "validFrom": "2026-07-11",
       "validTo": "2026-07-30"
-    },
-    "utilityFees": {
-      "electricity": "4000đ/kWh",
-      "water": "100.000đ/người",
-      "service": "200.000đ/tháng"
     }
   },
   {
@@ -121,11 +111,6 @@
       "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
       "validFrom": "2026-07-11",
       "validTo": "2026-07-30"
-    },
-    "utilityFees": {
-      "electricity": "4000đ/kWh",
-      "water": "100.000đ/người",
-      "service": "200.000đ/tháng"
     }
   },
   {
@@ -164,11 +149,6 @@
       "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
       "validFrom": "2026-07-11",
       "validTo": "2026-07-30"
-    },
-    "utilityFees": {
-      "electricity": "4000đ/kWh",
-      "water": "100.000đ/người",
-      "service": "200.000đ/tháng"
     }
   },
   {
@@ -207,11 +187,6 @@
       "text": "Lì xì ngay 500k / phòng giao dịch thành công khách cọc",
       "validFrom": "2026-07-11",
       "validTo": "2026-07-30"
-    },
-    "utilityFees": {
-      "electricity": "4000đ/kWh",
-      "water": "100.000đ/người",
-      "service": "200.000đ/tháng"
     }
   }
 ]

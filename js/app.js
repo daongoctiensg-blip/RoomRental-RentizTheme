@@ -160,6 +160,18 @@ function isPromoActive(promo) {
   return true;
 }
 
+// Phí điện/nước/dịch vụ: nhà có mức mặc định, phòng nào không tự đặt thì dùng theo nhà,
+// phòng nào có đặt riêng thì ưu tiên giá trị của phòng cho đúng field đó.
+function effectiveUtilityFees(prop, room) {
+  const p = (prop && prop.utilityFees) || {};
+  const r = (room && room.utilityFees) || {};
+  return {
+    electricity: r.electricity || p.electricity || '',
+    water: r.water || p.water || '',
+    service: r.service || p.service || ''
+  };
+}
+
 function matchesBaseFilters(prop, room, opts) {
   opts = opts || {};
   if (filters.propertyType && (prop.propertyType || 'phong_tro') !== filters.propertyType) return false;
@@ -515,6 +527,8 @@ function renderAdminRoomFormHtml(room, presetPropertyId, cloneFrom) {
   const src = room || cloneFrom || null;
   commissionRowsState = src && src.commissionPolicy ? src.commissionPolicy.map(r => ({ ...r })) : [];
   const uf = (src && src.utilityFees) || {};
+  const propForFees = PROPERTIES.find(p => p.id === ((room && room.propertyId) || presetPropertyId)) || null;
+  const defFees = (propForFees && propForFees.utilityFees) || {};
   return `
     <div class="detail-back"><button class="btn btn-sm" onclick="goAdminRoomList('${room ? room.propertyId : (presetPropertyId || (PROPERTIES[0] && PROPERTIES[0].id))}')">← Danh sách phòng</button></div>
     <div class="form-page">
@@ -600,19 +614,23 @@ function renderAdminRoomFormHtml(room, presetPropertyId, cloneFrom) {
         </div>
       </div>
 
+      <div class="form-row">
+        <label>${ICON_LBL_ELECTRIC} Điện / Nước / Phí dịch vụ — ghi đè riêng cho phòng này</label>
+        <div style="font-size:12px;color:var(--ink-soft);margin:-2px 0 8px;">Để trống thì dùng theo mức mặc định của nhà (ghi trong ô placeholder dưới đây).</div>
+      </div>
       <div class="form-grid-2">
         <div class="form-row">
           <label>${ICON_LBL_ELECTRIC} Điện</label>
-          <input id="f_feeElectricity" value="${uf.electricity || ''}" placeholder="4.000đ/kWh">
+          <input id="f_feeElectricity" value="${uf.electricity || ''}" placeholder="${defFees.electricity || 'Theo nhà: chưa đặt'}">
         </div>
         <div class="form-row">
           <label>${ICON_LBL_WATER} Nước</label>
-          <input id="f_feeWater" value="${uf.water || ''}" placeholder="20.000đ/m³">
+          <input id="f_feeWater" value="${uf.water || ''}" placeholder="${defFees.water || 'Theo nhà: chưa đặt'}">
         </div>
       </div>
       <div class="form-row">
         <label>${ICON_LBL_NOTE} Phí dịch vụ (giữ xe, vệ sinh...)</label>
-        <input id="f_feeService" value="${uf.service || ''}" placeholder="100.000đ/tháng — có thể ghi chú giảm giá riêng ở đây">
+        <input id="f_feeService" value="${uf.service || ''}" placeholder="${defFees.service || 'Theo nhà: chưa đặt'}">
       </div>
 
       <div class="form-row">
@@ -762,6 +780,21 @@ function renderAdminPropertyFormHtml(prop) {
         <label>${ICON_LBL_NEARBY} Xung quanh / di chuyển (mỗi dòng 1 ý)</label>
         <textarea id="pf_nearby">${prop ? (prop.nearby || []).join('\n') : ''}</textarea>
       </div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>${ICON_LBL_ELECTRIC} Điện (mặc định cho cả nhà)</label>
+          <input id="pf_feeElectricity" value="${prop && prop.utilityFees ? prop.utilityFees.electricity || '' : ''}" placeholder="4.000đ/kWh">
+        </div>
+        <div class="form-row">
+          <label>${ICON_LBL_WATER} Nước (mặc định cho cả nhà)</label>
+          <input id="pf_feeWater" value="${prop && prop.utilityFees ? prop.utilityFees.water || '' : ''}" placeholder="100.000đ/người">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>${ICON_LBL_NOTE} Phí dịch vụ (mặc định cho cả nhà)</label>
+        <input id="pf_feeService" value="${prop && prop.utilityFees ? prop.utilityFees.service || '' : ''}" placeholder="200.000đ/tháng">
+        <div style="font-size:12px;color:var(--ink-soft);margin-top:4px;">Áp dụng cho mọi phòng trong nhà. Phòng nào cần giá khác thì đặt riêng trong "Sửa phòng" — chỉ ghi đè đúng phòng đó.</div>
+      </div>
       <div class="modal-actions">
         ${prop ? `<button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Xoá nhà</button>` : ''}
         <button class="btn" onclick="goAdminProperties()">Huỷ</button>
@@ -782,6 +815,9 @@ function validatePropertyForm() {
 function saveProperty(propertyId) {
   if (!validatePropertyForm()) return;
   const split = id => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
+  const feeElectricity = document.getElementById('pf_feeElectricity').value.trim();
+  const feeWater = document.getElementById('pf_feeWater').value.trim();
+  const feeService = document.getElementById('pf_feeService').value.trim();
   const payload = {
     propertyType: document.getElementById('pf_propertyType').value,
     soNha: document.getElementById('pf_soNha').value.trim(),
@@ -790,7 +826,8 @@ function saveProperty(propertyId) {
     city: document.getElementById('pf_city').value.trim(),
     phone: document.getElementById('pf_phone').value.trim(),
     amenities: split('pf_amenities'),
-    nearby: split('pf_nearby')
+    nearby: split('pf_nearby'),
+    utilityFees: (feeElectricity || feeWater || feeService) ? { electricity: feeElectricity, water: feeWater, service: feeService } : null
   };
   if (propertyId) {
     const idx = PROPERTIES.findIndex(p => p.id === propertyId);

@@ -18,6 +18,11 @@
       "Thuận tiện di chuyển ra Crescent Mall Nguyễn Lương Bằng",
       "Gần khu chế xuất Tân Thuận, cảng Cát Lái",
       "Khu dân cư an ninh, tiện ích đầy đủ"
-    ]
+    ],
+    "utilityFees": {
+      "electricity": "4000đ/kWh",
+      "water": "100.000đ/người",
+      "service": "200.000đ/tháng"
+    }
   }
 ]
