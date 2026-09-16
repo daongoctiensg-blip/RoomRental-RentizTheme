@@ -103,7 +103,7 @@ main { padding: 0; max-width: none; margin: 0; }
 .layout {
   display: flex;
   gap: 24px;
-  max-width: 1300px;
+  max-width: 1760px;
   margin: 0 auto;
   padding: 0 28px 40px;
   align-items: flex-start;
@@ -212,11 +212,8 @@ main { padding: 0; max-width: none; margin: 0; }
 
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 16px;
-}
-@media (max-width: 760px) {
-  .room-grid { grid-template-columns: 1fr; }
 }
 
 .room-card {
@@ -261,10 +258,10 @@ main { padding: 0; max-width: none; margin: 0; }
 .room-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 
 .room-card-img {
-  width: 190px;
+  width: 320px;
   flex-shrink: 0;
   aspect-ratio: 4 / 3;
-  border-radius: 8px;
+  border-radius: var(--radius);
   overflow: hidden;
   background: var(--accent-soft);
   cursor: zoom-in;
@@ -279,6 +276,10 @@ main { padding: 0; max-width: none; margin: 0; }
   cursor: default;
 }
 .room-card-img.placeholder svg { width: 30%; height: 30%; opacity: .45; }
+
+@media (max-width: 900px) {
+  .room-card-img { width: 240px; }
+}
 
 @media (max-width: 480px) {
   .room-card { flex-direction: column; }
