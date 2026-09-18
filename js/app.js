@@ -356,6 +356,39 @@ function amenitiesNearbyHtml(prop) {
   return html;
 }
 
+// Gộp ảnh của TẤT CẢ phòng trong nhà thành 1 gallery — giống mục "Tổng quan"
+// của Trip.com: 1 ảnh to bên trái + lưới nhỏ bên phải, ô cuối có overlay
+// "Xem tất cả N ảnh" nếu còn ảnh chưa hiện hết.
+function propertyGalleryImages(propertyId) {
+  const rooms = ROOMS.filter(r => r.propertyId === propertyId);
+  const all = [];
+  rooms.forEach(r => (r.images || []).forEach(img => all.push(img)));
+  return all;
+}
+
+function detailGalleryHtml(images) {
+  if (!images.length) return '';
+  const hero = images[0];
+  const gridImgs = images.slice(1, 6);
+  const extra = images.length - 1 - gridImgs.length;
+  return `
+    <div class="detail-gallery">
+      <div class="detail-gallery-hero" onclick="openLightbox('${hero}')">
+        <img src="${hero}" alt="">
+      </div>
+      ${gridImgs.length ? `
+      <div class="detail-gallery-grid">
+        ${gridImgs.map((img, i) => `
+          <div class="detail-gallery-thumb" onclick="openLightbox('${img}')">
+            <img src="${img}" alt="">
+            ${(i === gridImgs.length - 1 && extra > 0) ? `<div class="detail-gallery-overlay">${ICON_LBL_IMG}<span>Xem tất cả ${images.length} ảnh</span></div>` : ''}
+          </div>
+        `).join('')}
+      </div>` : ''}
+    </div>
+  `;
+}
+
 function renderPropertyDetailView() {
   const el = document.getElementById('main-content');
   const prop = PROPERTIES.find(p => p.id === detailView.propertyId);
@@ -363,10 +396,10 @@ function renderPropertyDetailView() {
   // Hiện TẤT CẢ phòng của nhà này, không áp bộ lọc tìm kiếm đang chọn — đúng như Trip.com hiện cả khách sạn
   const rooms = ROOMS.filter(r => r.propertyId === prop.id);
   document.getElementById('roomCount').textContent = rooms.length;
-  const heroImg = rooms.map(r => r.images && r.images[0]).find(Boolean);
+  const galleryImages = propertyGalleryImages(prop.id);
   el.innerHTML = `
     <div class="detail-back"><button class="btn btn-sm" onclick="closePropertyDetail()">← Quay lại danh sách</button></div>
-    ${heroImg ? `<img class="detail-hero" src="${heroImg}" alt="">` : ''}
+    ${detailGalleryHtml(galleryImages)}
     <div class="detail-head">
       <div>
         <h2>${prop.soNha}</h2>
