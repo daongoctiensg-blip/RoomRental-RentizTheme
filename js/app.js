@@ -278,7 +278,7 @@ function roomCardHtml(r, prop, opts) {
 }
 
 function setSearchChromeVisible(visible) {
-  const toolbar = document.querySelector('.toolbar');
+  const toolbar = document.querySelector('.search-bar-wrap');
   const sidebarEl = document.getElementById('sidebar');
   const dashEl = document.getElementById('miniDashboard');
   const display = visible ? '' : 'none';

@@ -20,20 +20,34 @@
   </div>
 </div>
 
-<div class="toolbar">
-  <input type="text" placeholder="Tìm mã phòng / địa chỉ..." oninput="setSearch(this.value)" style="width:220px;">
-  <select id="filterDistrict" onchange="onDistrictChange(this.value)"></select>
-  <input type="text" id="filterWardInput" list="wardList" placeholder="Phường/Xã..." style="width:200px;" oninput="setFilterWard(this.value)">
-  <datalist id="wardList"></datalist>
-  <select id="sortBySelect" onchange="setSortBy(this.value)">
-    <option value="default">Sắp xếp: mặc định</option>
-    <option value="price_asc">Giá thấp → cao</option>
-    <option value="price_desc">Giá cao → thấp</option>
-    <option value="newest">Mới thêm trước</option>
-  </select>
-  <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
-  <div class="spacer"></div>
-  <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
+<div class="search-bar-wrap">
+  <div class="search-bar">
+    <label class="search-bar-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"></circle><line x1="16" y1="16" x2="21" y2="21"></line></svg>
+      <input type="text" placeholder="Tìm mã phòng / địa chỉ..." oninput="setSearch(this.value)">
+    </label>
+    <label class="search-bar-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      <select id="filterDistrict" onchange="onDistrictChange(this.value)"></select>
+    </label>
+    <label class="search-bar-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      <input type="text" id="filterWardInput" list="wardList" placeholder="Phường/Xã..." oninput="setFilterWard(this.value)">
+      <datalist id="wardList"></datalist>
+    </label>
+  </div>
+
+  <div class="toolbar-secondary">
+    <select id="sortBySelect" onchange="setSortBy(this.value)">
+      <option value="default">Sắp xếp: mặc định</option>
+      <option value="price_asc">Giá thấp → cao</option>
+      <option value="price_desc">Giá cao → thấp</option>
+      <option value="newest">Mới thêm trước</option>
+    </select>
+    <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
+    <div class="spacer"></div>
+    <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
+  </div>
 </div>
 
 <div class="layout">
