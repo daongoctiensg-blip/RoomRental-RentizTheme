@@ -32,6 +32,7 @@ const ICON_LBL_STATUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentCol
 const ICON_LBL_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-5 4 4 3-3 4 4"/></svg>';
 const ICON_LBL_ELECTRIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>';
 const ICON_LBL_WATER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>';
+const ICON_LBL_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>';
 
 // ── Lightbox (xem ảnh to + dải thumbnail, vanilla — không thêm thư viện) ──
 function openLightbox(images, startIndex) {
@@ -267,6 +268,16 @@ function setPriceBucket(key) {
 // ── Render ────────────────────────────────────────────────
 let detailView = null; // { propertyId, highlightRoomId } | null — xem "1 nhà + tất cả phòng của nó"
 
+// Lấy 1 tiện ích + 1 điểm gần thật của nhà làm tag nhỏ trên card — không bịa,
+// chỉ hiện khi property thực sự có data đó.
+function roomCardQuickTagsHtml(prop) {
+  const tags = [];
+  if (prop.amenities && prop.amenities[0]) tags.push(prop.amenities[0]);
+  if (prop.nearby && prop.nearby[0]) tags.push(prop.nearby[0]);
+  if (!tags.length) return '';
+  return `<div class="quick-tags">${tags.map(t => `<span class="tag-neutral">${t}</span>`).join('')}</div>`;
+}
+
 function roomCardHtml(r, prop, opts) {
   opts = opts || {};
   const mode = opts.mode || 'browse'; // 'browse' (khách xem, chỉ Xuất PDF) | 'admin' (Sửa/Nhân bản/Xoá/Xuất PDF)
@@ -294,6 +305,8 @@ function roomCardHtml(r, prop, opts) {
             <span class="meta-item">${ICON_AREA}${r.areaM2}m²</span>
             <span class="meta-item">${ICON_DOOR}${ROOM_TYPE_LABEL[r.roomType] || r.roomType}</span>
           </div>
+          ${roomCardQuickTagsHtml(prop)}
+          ${r.notes ? `<div class="room-note">${r.notes}</div>` : ''}
         </div>
         <div class="room-card-foot">
           <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
@@ -375,15 +388,37 @@ function closePropertyDetail() {
   detailView = null;
   render();
 }
-function amenitiesNearbyHtml(prop) {
-  let html = '';
-  if (prop.amenities && prop.amenities.length) {
-    html += `<div class="detail-highlights"><div class="detail-highlights-title">${ICON_LBL_AMENITY} Điểm nổi bật</div><ul>${prop.amenities.map(a => `<li>${a}</li>`).join('')}</ul></div>`;
-  }
-  if (prop.nearby && prop.nearby.length) {
-    html += `<div class="detail-highlights"><div class="detail-highlights-title">${ICON_LBL_NEARBY} Xung quanh</div><ul>${prop.nearby.map(a => `<li>${a}</li>`).join('')}</ul></div>`;
-  }
-  return html;
+function amenitiesGridHtml(prop) {
+  if (!prop.amenities || !prop.amenities.length) return '';
+  return `
+    <div class="detail-card" id="tien-nghi">
+      <h3 class="detail-card-title">${ICON_LBL_AMENITY} Tiện nghi chỗ nghỉ</h3>
+      <div class="detail-plain-grid">
+        ${prop.amenities.map(a => `<span>${ICON_LBL_CHECK}${a}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function nearbyGridHtml(prop) {
+  if (!prop.nearby || !prop.nearby.length) return '';
+  const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(fullAddress(prop));
+  return `
+    <div class="detail-card" id="vi-tri">
+      <h3 class="detail-card-title">${ICON_LBL_NEARBY} Xem xung quanh đây</h3>
+      <div class="detail-pin-grid">
+        ${prop.nearby.map(spot => `<span>${ICON_LBL_PIN}${spot}</span>`).join('')}
+      </div>
+      <a href="${mapUrl}" target="_blank" rel="noopener" class="detail-map-link">Xem trên bản đồ →</a>
+    </div>
+  `;
+}
+
+function priceRangeText(rooms) {
+  if (!rooms.length) return '';
+  const prices = rooms.map(r => r.priceMonthly);
+  const min = Math.min(...prices), max = Math.max(...prices);
+  return min === max ? `${fmtPrice(min)}/tháng` : `${fmtPrice(min)} – ${fmtPrice(max)}/tháng`;
 }
 
 // Gộp ảnh của TẤT CẢ phòng trong nhà thành 1 gallery — giống mục "Tổng quan"
@@ -403,7 +438,7 @@ function detailGalleryHtml(images) {
   const extra = images.length - 1 - gridImgs.length;
   const imagesAttr = JSON.stringify(images).replace(/'/g, '&#39;');
   return `
-    <div class="detail-gallery" data-images='${imagesAttr}'>
+    <div class="detail-gallery" id="tong-quan" data-images='${imagesAttr}'>
       <div class="detail-gallery-hero" onclick="openLightbox(JSON.parse(this.closest('.detail-gallery').dataset.images), 0)">
         <img src="${hero}" alt="">
       </div>
@@ -428,21 +463,59 @@ function renderPropertyDetailView() {
   const rooms = ROOMS.filter(r => r.propertyId === prop.id);
   document.getElementById('roomCount').textContent = rooms.length;
   const galleryImages = propertyGalleryImages(prop.id);
+  const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(fullAddress(prop));
+  const uf = prop.utilityFees || {};
   el.innerHTML = `
     <div class="detail-back"><button class="btn btn-sm" onclick="closePropertyDetail()">← Quay lại danh sách</button></div>
-    ${detailGalleryHtml(galleryImages)}
-    <div class="detail-head">
+
+    <div class="detail-title-block">
       <div>
-        <h2>${prop.soNha}</h2>
-        <div class="addr">${fullAddress(prop)}</div>
+        <div class="detail-kicker">${prop.ward}</div>
+        <h1>${prop.soNha}</h1>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
+      <div class="detail-price-from">
+        <div class="label">Giá phòng</div>
+        <div class="value">${priceRangeText(rooms)}</div>
       </div>
     </div>
-    ${amenitiesNearbyHtml(prop)}
-    <div class="room-grid">
-      ${rooms.map(r => roomCardHtml(r, prop, { highlight: r.id === detailView.highlightRoomId })).join('')}
+
+    <div class="detail-subnav">
+      <a href="#tong-quan">Tổng quan</a>
+      <a href="#phong">Phòng</a>
+      <a href="#tien-nghi">Tiện nghi</a>
+      <a href="#vi-tri">Vị trí</a>
+    </div>
+
+    ${detailGalleryHtml(galleryImages)}
+
+    <div class="detail-2col">
+      <div class="detail-2col-main">
+        ${amenitiesGridHtml(prop)}
+        ${nearbyGridHtml(prop)}
+      </div>
+      <div class="detail-2col-side">
+        <div class="detail-card">
+          <h3 class="detail-card-title">${ICON_LBL_PHONE} Thông tin nhà</h3>
+          <div class="detail-info-rows">
+            <div><span>Địa chỉ</span><strong>${fullAddress(prop)}</strong></div>
+            <div><span>Điện thoại</span><strong>${prop.phone || '—'}</strong></div>
+            ${uf.electricity ? `<div><span>Điện</span><strong>${uf.electricity}</strong></div>` : ''}
+            ${uf.water ? `<div><span>Nước</span><strong>${uf.water}</strong></div>` : ''}
+            ${uf.service ? `<div><span>Phí dịch vụ</span><strong>${uf.service}</strong></div>` : ''}
+          </div>
+          <div class="detail-card-actions">
+            <button class="btn btn-primary" style="width:100%;" onclick="exportProperty('${prop.id}')">Xuất PDF cả nhà</button>
+            <a href="${mapUrl}" target="_blank" rel="noopener" class="btn" style="width:100%;text-align:center;">Xem trên bản đồ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card" id="phong" style="margin-top:20px;">
+      <h3 class="detail-card-title" style="font-size:20px;">Chọn phòng</h3>
+      <div class="room-grid">
+        ${rooms.map(r => roomCardHtml(r, prop, { highlight: r.id === detailView.highlightRoomId })).join('')}
+      </div>
     </div>
   `;
   if (detailView.highlightRoomId) {
