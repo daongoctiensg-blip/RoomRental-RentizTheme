@@ -252,7 +252,7 @@ function roomCardHtml(r, prop, opts) {
       </div>
       <div class="room-card-body">
         <div onclick="${mode === 'admin' ? `goAdminRoomForm('${r.id}')` : `openPropertyDetail('${prop.id}', '${r.id}')`}">
-          <div class="room-addr">${prop.soNha}</div>
+          <div class="room-addr">${ICON_LBL_PIN}${prop.soNha}</div>
           <div class="floor">${r.floor}</div>
           <div class="code">${r.code}</div>
           ${isPromoActive(r.promotion) ? `<div class="promo-tag">🎉 ${r.promotion.text}</div>` : ''}
@@ -263,7 +263,7 @@ function roomCardHtml(r, prop, opts) {
         </div>
         <div class="room-card-foot">
           <div class="price">${fmtPrice(r.priceMonthly)}/tháng</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="actions">
             ${mode === 'admin' ? `
               <button class="btn btn-sm" onclick="goAdminRoomForm('${r.id}')">Sửa</button>
               <button class="btn btn-sm" onclick="duplicateRoom('${r.id}')">Nhân bản</button>
