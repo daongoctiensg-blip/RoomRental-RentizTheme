@@ -110,6 +110,10 @@ function syncFilterSidebarUI() {
     ch.checked = filters.propertyType === 'can_ho';
   }
   updatePriceSliderUI();
+  const seg = document.getElementById('sortSeg');
+  if (seg) {
+    seg.querySelectorAll('.seg-opt').forEach(btn => btn.classList.toggle('active', btn.dataset.val === sortBy));
+  }
 }
 function setFilterWard(v) {
   detailView = null;
@@ -281,10 +285,12 @@ function setSearchChromeVisible(visible) {
   const toolbar = document.querySelector('.search-bar-wrap');
   const sidebarEl = document.getElementById('sidebar');
   const dashEl = document.getElementById('miniDashboard');
+  const resultsHeader = document.querySelector('.results-header');
   const display = visible ? '' : 'none';
   if (toolbar) toolbar.style.display = display;
   if (sidebarEl && !sidebarEl.classList.contains('open')) sidebarEl.style.display = display;
   if (dashEl) dashEl.style.display = display;
+  if (resultsHeader) resultsHeader.style.display = visible ? 'flex' : 'none';
 }
 
 function render() {

@@ -36,18 +36,6 @@
       <datalist id="wardList"></datalist>
     </label>
   </div>
-
-  <div class="toolbar-secondary">
-    <select id="sortBySelect" onchange="setSortBy(this.value)">
-      <option value="default">Sắp xếp: mặc định</option>
-      <option value="price_asc">Giá thấp → cao</option>
-      <option value="price_desc">Giá cao → thấp</option>
-      <option value="newest">Mới thêm trước</option>
-    </select>
-    <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
-    <div class="spacer"></div>
-    <div>Đang hiện <strong id="roomCount">0</strong> phòng</div>
-  </div>
 </div>
 
 <div class="layout">
@@ -75,6 +63,18 @@
   </aside>
 
   <div class="content-col">
+    <div class="results-header">
+      <h2>Tìm thấy <strong id="roomCount">0</strong> phòng phù hợp</h2>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="seg" id="sortSeg">
+          <button class="seg-opt" data-val="default" onclick="setSortBy('default')">Mặc định</button>
+          <button class="seg-opt" data-val="price_asc" onclick="setSortBy('price_asc')">Giá thấp nhất</button>
+          <button class="seg-opt" data-val="price_desc" onclick="setSortBy('price_desc')">Giá cao nhất</button>
+          <button class="seg-opt" data-val="newest" onclick="setSortBy('newest')">Mới nhất</button>
+        </div>
+        <button class="btn mobile-filter-btn" onclick="openMobileFilters()">⚙ Bộ lọc</button>
+      </div>
+    </div>
     <div id="miniDashboard"></div>
     <main id="main-content"></main>
   </div>

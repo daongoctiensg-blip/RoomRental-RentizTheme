@@ -110,24 +110,40 @@ h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; margin: 0; lett
 .search-bar-field input:focus, .search-bar-field select:focus { outline: none; }
 .search-bar-field input::placeholder { color: var(--ink-soft); font-weight: 500; }
 
-.toolbar-secondary {
+.results-header {
   display: flex;
-  gap: 10px;
-  padding: 0 0 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
   flex-wrap: wrap;
-  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
 }
-.toolbar-secondary select {
+.results-header h2 { font-size: 26px; }
+.results-header h2 strong { color: var(--accent-darker); }
+
+.seg {
+  display: inline-flex;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 9px 12px;
-  font-size: 14px;
-  font-family: inherit;
+  overflow: hidden;
   background: var(--surface);
-  transition: border-color .15s, box-shadow .15s;
 }
-.toolbar-secondary select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); outline: none; }
-.toolbar-secondary .spacer { flex: 1; }
+.seg-opt {
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.seg-opt:last-child { border-right: none; }
+.seg-opt.active { background: var(--accent); color: #fff; font-weight: 600; }
+.seg-opt:not(.active):hover { background: var(--accent-soft); }
 
 main { padding: 0; max-width: none; margin: 0; }
 
