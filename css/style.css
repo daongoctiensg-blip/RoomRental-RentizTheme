@@ -1,39 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
 
 :root {
-  --bg: #f4f6fa;
+  --bg: #f4f6f9;
   --surface: #ffffff;
-  --ink: #1a1f36;
-  --ink-soft: #6b7280;
-  --border: #e5e8ef;
-  --accent: #2f5bff;
-  --accent-dark: #2447d1;
-  --accent-soft: #eaefff;
-  --brass: #2f5bff;
+  --ink: #1d1f20;
+  --ink-soft: #6b6e70;
+  --border: #e2e5e8;
+  --accent: #5980a6;
+  --accent-dark: #416180;
+  --accent-darker: #2c455d;
+  --accent-soft: #eef6ff;
+  --brass: #5980a6;
   --status-trong: #14804a;
   --status-trong-bg: #e5f7ee;
   --status-thue: #c0392b;
   --status-thue-bg: #fdecea;
   --status-giu: #b8860b;
   --status-giu-bg: #fdf3d9;
-  --radius: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 3px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .04);
-  --shadow-md: 0 4px 12px rgba(16, 24, 40, .08), 0 2px 4px rgba(16, 24, 40, .04);
-  --shadow-lg: 0 12px 28px rgba(16, 24, 40, .12);
+  --radius: 6px;
+  --radius-lg: 10px;
+  --font-heading: 'Barlow Condensed', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+  --shadow-sm: 0 1px 6px rgba(20, 40, 70, .07);
+  --shadow-md: 0 2px 12px rgba(20, 40, 70, .08);
+  --shadow-lg: 0 18px 50px rgba(16, 24, 38, .28);
 }
 
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--ink);
   font-size: 15px;
   line-height: 1.5;
 }
 
-h1, h2, h3 { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; margin: 0; letter-spacing: -.005em; }
 
 .app-header {
   background: var(--surface);
@@ -45,13 +48,15 @@ h1, h2, h3 { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; marg
   flex-wrap: wrap;
   gap: 12px;
 }
-.app-header h1 { font-size: 22px; }
+.app-header h1 { font-size: 24px; }
 .app-header .sub { color: var(--ink-soft); font-size: 13px; margin-top: 2px; }
 
 .btn {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--ink);
+  font-family: var(--font-heading);
+  font-weight: 600;
   padding: 9px 16px;
   border-radius: var(--radius);
   font-size: 14px;
@@ -237,15 +242,15 @@ main { padding: 0; max-width: none; margin: 0; }
   background: var(--status-giu-bg);
   border: none;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: 4px;
   margin-bottom: 6px;
 }
 .room-card .floor { font-size: 12px; color: var(--ink-soft); }
-.room-card .code { font-size: 17px; font-weight: 700; margin: 2px 0 6px; }
+.room-card .code { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin: 2px 0 6px; }
 .room-card .meta { display: flex; gap: 12px; align-items: center; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; flex-wrap: wrap; }
 .room-card .meta-item { display: inline-flex; align-items: center; gap: 4px; }
 .room-card .meta-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .65; }
-.room-card .price { font-size: 18px; color: var(--accent); font-weight: 800; }
+.room-card .price { font-family: var(--font-heading); font-size: 22px; color: var(--accent-darker); font-weight: 700; }
 
 .room-card-body {
   flex: 1;
@@ -375,7 +380,7 @@ main { padding: 0; max-width: none; margin: 0; }
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 4px;
   position: absolute;
   top: 8px;
   right: 8px;
@@ -502,7 +507,7 @@ main { padding: 0; max-width: none; margin: 0; }
 .dash-chip {
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
