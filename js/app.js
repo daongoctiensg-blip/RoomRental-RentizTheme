@@ -33,14 +33,44 @@ const ICON_LBL_IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
 const ICON_LBL_ELECTRIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>';
 const ICON_LBL_WATER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>';
 
-// ── Lightbox (xem ảnh to, vanilla — không thêm thư viện) ────
-function openLightbox(url) {
-  if (!url) return;
+// ── Lightbox (xem ảnh to + dải thumbnail, vanilla — không thêm thư viện) ──
+function openLightbox(images, startIndex) {
+  if (typeof images === 'string') images = [images]; // cho phép gọi với 1 url đơn lẻ (tương thích cũ)
+  if (!images || !images.length) return;
+  document.querySelectorAll('.lightbox-overlay').forEach(el => el.remove()); // đóng lightbox cũ nếu còn (tránh xếp lớp chồng)
+  let idx = startIndex || 0;
+
   const overlay = document.createElement('div');
   overlay.className = 'lightbox-overlay';
-  overlay.onclick = () => overlay.remove();
-  overlay.innerHTML = `<img src="${url}" alt="" onclick="event.stopPropagation()">`;
+  overlay.onclick = () => { overlay.remove(); cleanupLightboxHandlers(); };
   document.body.appendChild(overlay);
+
+  function renderLightbox() {
+    overlay.innerHTML = `
+      <div class="lightbox-main" onclick="event.stopPropagation()">
+        <img src="${images[idx]}" alt="">
+        ${images.length > 1 ? `
+          <button class="lightbox-arrow lightbox-prev" onclick="event.stopPropagation(); window.__lightboxPrev()">‹</button>
+          <button class="lightbox-arrow lightbox-next" onclick="event.stopPropagation(); window.__lightboxNext()">›</button>
+          <div class="lightbox-counter">${idx + 1}/${images.length}</div>
+        ` : ''}
+      </div>
+      ${images.length > 1 ? `
+        <div class="lightbox-thumbs" onclick="event.stopPropagation()">
+          ${images.map((img, i) => `<button class="lightbox-thumb${i === idx ? ' active' : ''}" onclick="window.__lightboxGoto(${i})"><img src="${img}" alt=""></button>`).join('')}
+        </div>
+      ` : ''}
+    `;
+  }
+  window.__lightboxPrev = () => { idx = (idx - 1 + images.length) % images.length; renderLightbox(); };
+  window.__lightboxNext = () => { idx = (idx + 1) % images.length; renderLightbox(); };
+  window.__lightboxGoto = (i) => { idx = i; renderLightbox(); };
+  renderLightbox();
+}
+function cleanupLightboxHandlers() {
+  delete window.__lightboxPrev;
+  delete window.__lightboxNext;
+  delete window.__lightboxGoto;
 }
 
 let PROPERTIES = [];
@@ -371,15 +401,16 @@ function detailGalleryHtml(images) {
   const hero = images[0];
   const gridImgs = images.slice(1, 6);
   const extra = images.length - 1 - gridImgs.length;
+  const imagesAttr = JSON.stringify(images).replace(/'/g, '&#39;');
   return `
-    <div class="detail-gallery">
-      <div class="detail-gallery-hero" onclick="openLightbox('${hero}')">
+    <div class="detail-gallery" data-images='${imagesAttr}'>
+      <div class="detail-gallery-hero" onclick="openLightbox(JSON.parse(this.closest('.detail-gallery').dataset.images), 0)">
         <img src="${hero}" alt="">
       </div>
       ${gridImgs.length ? `
       <div class="detail-gallery-grid">
         ${gridImgs.map((img, i) => `
-          <div class="detail-gallery-thumb" onclick="openLightbox('${img}')">
+          <div class="detail-gallery-thumb" onclick="openLightbox(JSON.parse(this.closest('.detail-gallery').dataset.images), ${i + 1})">
             <img src="${img}" alt="">
             ${(i === gridImgs.length - 1 && extra > 0) ? `<div class="detail-gallery-overlay">${ICON_LBL_IMG}<span>Xem tất cả ${images.length} ảnh</span></div>` : ''}
           </div>
@@ -440,7 +471,7 @@ function setRoomImg(dot, idx) {
 function openLightboxFromCard(el) {
   const images = JSON.parse(el.dataset.images || '[]');
   const idx = parseInt(el.dataset.idx || '0', 10);
-  if (images.length) openLightbox(images[idx]);
+  if (images.length) openLightbox(images, idx);
 }
 
 // ── Toast + confirm tự chế (thay cho alert()/confirm() của trình duyệt) ──
